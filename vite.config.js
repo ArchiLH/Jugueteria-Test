@@ -5,11 +5,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173, // Cambia este número al puerto que desees, como 3000, 8000, etc.
+    port: 5173, // Cambia este número al puerto que desees
   },
-  resolve: {
-    alias: {
-      '@stripe/react-stripe-js': require.resolve('@stripe/react-stripe-js'),
-    },
-  },
+  // Elimina la configuración de alias
 });
