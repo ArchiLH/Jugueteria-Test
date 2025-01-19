@@ -3,7 +3,7 @@ import { useCheckout } from "../hooks/useCheckout";
 import CheckoutProgress from "../components/checkout/CheckoutProgreso";
 import PersonalDataForm from "../components/checkout/DatosPersonales";
 import DeliveryForm from "../components/checkout/FormEntrega";
-import PaymentForm from "../components/checkout/FormPago";
+import StripeWrapper from "../components/stripe/StripeWrapper";
 import OrderSummary from "../components/carrito/ResumenCarrito";
 import NavigationButtons from "../components/checkout/BotonesNavegacion";
 import BannerCheckout from "../components/checkout/BannerCheckout";
@@ -11,7 +11,7 @@ import { useCart } from "../context/CartContext";
 
 function Checkout() {
   const navigate = useNavigate();
-  const { cart, subtotal } = useCart(); // Obtenemos datos del carrito
+  const { cart, subtotal } = useCart();
   const {
     step,
     formData,
@@ -23,7 +23,7 @@ function Checkout() {
     processPayment,
   } = useCheckout();
 
-  //Validación para carrito vacío
+  // Validación para carrito vacío
   if (!cart || cart.length === 0) {
     return (
       <div className="text-center py-12">
@@ -38,18 +38,26 @@ function Checkout() {
     );
   }
 
+  // Función para manejar el submit del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      if (await processPayment()) {
-        navigate("/order-confirmacion");
+
+    // Solo procesamos el pago si todos los pasos son válidos
+    if (step === 3) {
+      try {
+        if (await processPayment()) {
+          navigate("/order-confirmacion");
+        }
+      } catch (error) {
+        console.error("Error al procesar el pago:", error);
+        // Mostrar mensaje de error al usuario si ocurre un fallo
       }
-    } catch (error) {
-      console.error("Error al procesar el pago:", error);
-      // Aquí podrías mostrar un mensaje de error al usuario
+    } else {
+      handleNextStep(); // Avanzar al siguiente paso si no estamos en el paso final
     }
   };
 
+  // Renderizar el contenido de acuerdo con el paso actual
   const renderStepContent = () => {
     switch (step) {
       case 1:
@@ -70,7 +78,7 @@ function Checkout() {
         );
       case 3:
         return (
-          <PaymentForm
+          <StripeWrapper
             formData={formData}
             handleChange={handleChange}
             errors={errors}
@@ -89,7 +97,9 @@ function Checkout() {
 
         <div className="flex flex-col md:flex-row gap-8">
           <div className="w-full md:w-2/3 bg-white rounded-lg shadow-md p-6">
-            <form onSubmit={handleSubmit}>{renderStepContent()}</form>
+            <form onSubmit={handleSubmit}>
+              {renderStepContent()}
+            </form>
           </div>
 
           <div className="w-full md:w-1/3">

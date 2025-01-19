@@ -1,18 +1,35 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "../components/catalogo/ProductCard";
 import Filtros from "../components/catalogo/Filtros";
-import { productos as initialProducts } from "../data/productos";
 
 function CatalogoProductos() {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({
     categorias: [],
     marcas: [],
     precio: [],
   });
-
-  // Estados de filtro Precios
   const [orden, setOrden] = useState("");
+  const [error, setError] = useState(null);
+
+  // Obtener productos desde la API
+  useEffect(() => {
+    fetch("http://localhost:8080/api/productos")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error en la respuesta de la API");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          setError("Los datos de productos no son válidos.");
+        }
+      })
+      .catch((error) => setError(`Error al obtener los productos: ${error.message}`));
+  }, []);
 
   const handleFilterChange = (filterType, value) => {
     setFilters((prevFilters) => ({
@@ -28,17 +45,20 @@ function CatalogoProductos() {
   };
 
   const filterProducts = () => {
-    let filteredProducts = initialProducts;
+    if (products.length === 0) return []; // Retorna un array vacío si no hay productos aún
 
+    let filteredProducts = products;
+
+    // Filtros de categorías, marcas y precio
     if (filters.categorias.length > 0) {
       filteredProducts = filteredProducts.filter((product) =>
-        filters.categorias.includes(product.categoria),
+        filters.categorias.includes(product.categoria)
       );
     }
 
     if (filters.marcas.length > 0) {
       filteredProducts = filteredProducts.filter((product) =>
-        filters.marcas.includes(product.brand),
+        filters.marcas.includes(product.brand)
       );
     }
 
@@ -47,23 +67,30 @@ function CatalogoProductos() {
         const price = parseFloat(product.price);
         return filters.precio.some((range) => {
           const [min, max] = range.split("-").map(Number);
-          return price >= min && (max ? price <= max : true);
+          return price >= min && (max ? price <= max : price >= min);
         });
       });
     }
 
+    // Ordenar productos por precio
     if (orden === "menor-mayor") {
-      filteredProducts.sort((a, b) => b.price - a.price);
-    } else {
       filteredProducts.sort((a, b) => a.price - b.price);
+    } else if (orden === "mayor-menor") {
+      filteredProducts.sort((a, b) => b.price - a.price);
     }
 
-    setProducts(filteredProducts);
+    return filteredProducts;
   };
 
-  useEffect(() => {
-    filterProducts();
-  }, [filters, orden]);
+  const filteredProducts = filterProducts();
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!products.length && !error) {
+    return <div>Cargando productos...</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -90,9 +117,13 @@ function CatalogoProductos() {
         <Filtros filters={filters} handleFilterChange={handleFilterChange} />
 
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow ml-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          ) : (
+            <p>No se encontraron productos</p>
+          )}
         </section>
       </div>
     </div>
