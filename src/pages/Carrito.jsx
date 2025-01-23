@@ -2,7 +2,8 @@ import { useCart } from "../context/CartContext";
 import Producto from "../components/carrito/ProductoCarrito";
 import Resumen from "../components/carrito/ResumenCarrito";
 import BannerCategoria from "../components/BannerCategoria";
-import { useState } from "react";
+import BotonCheckout from "../components/carrito/BotonCheckout";
+// import { useState } from "react";
 
 function Carrito() {
   // Usamos el contexto del carrito
@@ -54,6 +55,7 @@ function Carrito() {
             descuentos={0}
             total={subtotal} // Puedes ajustar esto según tu lógica de descuentos
           />
+          <BotonCheckout />
         </div>
       </div>
     </>
