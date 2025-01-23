@@ -1,11 +1,37 @@
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';  // Importa useEffect
+import { useCart } from '../../context/CartContext';
+import { useFavoritos } from '../../context/FavoritosContext';
+import { FaRegHeart, FaHeart, FaShoppingCart } from "react-icons/fa";
 
 function ProductDetail() {
   const { id } = useParams();  // Obtiene el parámetro id de la URL
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { addItem, cart } = useCart(); // Obtenemos las funciones del contexto
+  const { toggleFavorite, isFavorite } = useFavoritos(); // Obtenemos las funciones del contexto de favoritos
+  const [isAdding, setIsAdding] = useState(false);  
+
+  // Verificar si el producto ya está en el carrito
+  const itemInCart = cart.find((item) => item.id === product?.id);
+  const quantityInCart = itemInCart ? itemInCart.quantity : 0;
+
+  const productIsFavorite = isFavorite(product?.id); // Verifica si el producto es favorito o no 
+
+  // Manejador para agregar al carrito
+  const handleAddToCart = (e) => {
+    e.preventDefault(); // Previene la navegación del Link
+    setIsAdding(true);
+    addItem(product);
+
+    // Resetea el estado después de un momento
+    setTimeout(() => {
+      setIsAdding(false);
+    }, 1000);
+  };
+
 
   useEffect(() => {
     // Realiza la solicitud para obtener el producto específico con el id
@@ -68,25 +94,35 @@ function ProductDetail() {
           </div>
 
           <div className="mt-6">
-            <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
-              Agregar al Carrito
+            {/* Botón de agregar al carrito */}
+            <button
+              onClick={handleAddToCart}
+              disabled={isAdding}
+              className={`w-full font-bold py-2 px-4 rounded transition-all flex items-center justify-center gap-2 ${isAdding
+                ? "bg-green-700 text-white cursor-not-allowed opacity-75"
+                : "bg-green-500 hover:bg-green-600 text-white"
+                }`}
+            >
+              <FaShoppingCart size={16} />
+              {isAdding
+                ? "¡Agregado!"
+                : quantityInCart > 0
+                  ? "Agregar más"
+                  : "Agregar al Carrito"}
             </button>
-            <button className="ml-2 text-gray-600 hover:text-red-500 flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-5 h-5 mr-1"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-              Agregar a Favoritos
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                toggleFavorite(product);
+              }}
+              className={`text-gray-500 hover:text-red-500 flex items-center p-2 transition-colors ${productIsFavorite ? "text-red-500" : ""
+                }`}
+            >
+              {productIsFavorite ? (
+                <FaHeart size={20} />
+              ) : (
+                <FaRegHeart size={20} />
+              )}
             </button>
           </div>
         </div>

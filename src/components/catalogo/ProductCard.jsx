@@ -13,7 +13,7 @@ function ProductCard({ product }) {
   const itemInCart = cart.find((item) => item.id === product.id);
   const quantityInCart = itemInCart ? itemInCart.quantity : 0;
 
-  const productIsFavorite = isFavorite(product.id);
+  const productIsFavorite = isFavorite(product.id); // Verificar si el producto es favorito o no y actualizar el estado de favoritos al hacer clic en el corazón de la tarjeta de producto y mostrar el icono correspondiente. Si el producto es favorito, se muestra el corazón lleno, de lo contrario, se muestra el corazón vacío.
 
   // Manejador para agregar al carrito
   const handleAddToCart = (e) => {
