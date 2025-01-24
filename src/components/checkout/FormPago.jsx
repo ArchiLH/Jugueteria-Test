@@ -27,27 +27,55 @@ const PaymentForm = ({ formData, handleChange, errors }) => {
             </label>
           </div>
 
-          <div className="flex items-center p-3 border rounded-md bg-white">
+          {/* PayPal */}
+        <div className="flex items-center p-3 border rounded-md bg-white">
             <input
               type="radio"
-              id="culqi"
+              id="paypal"
               name="metodoPago"
-              value="culqi"
-              checked={formData.metodoPago === "culqi"}
+              value="paypal"
+              checked={formData.metodoPago === "paypal"}
               onChange={handleChange}
               className="mr-3 focus:ring-green-500"
             />
-            <label htmlFor="culqi" className="flex items-center flex-1">
-              <span className="text-gray-700 font-medium">Culqi</span>
-              <img src="/culqi.svg" alt="Culqi" className="h-6 ml-auto" />
+            <label htmlFor="paypal" className="flex items-center flex-1">
+              <span className="text-gray-700 font-medium">PayPal</span>
+              <div className="ml-auto">
+                <img src="/paypal.svg" alt="PayPal" className="h-6" />
+              </div>
             </label>
           </div>
         </div>
-
-        {/* {errors.payment && (
-          <p className="mt-2 text-red-600 text-sm">{errors.payment}</p>
-        )} */}
       </div>
+
+      {/* Render PayPal Buttons if PayPal is selected */}
+      {formData.metodoPago === "paypal" && (
+        <PayPalScriptProvider options={{ "client-id": "AfQTM5li-eR22K84cV89UkywMGGwglRx7xZjXR1P DzQQNbL-171MwtrC-NNIADeQVfvXy5qEWxIRphPF"
+         
+         }}>
+          <PayPalButtons
+            style={{ layout: "vertical" }}
+            createOrder={(data, actions) => {
+              return actions.order.create({
+                purchase_units: [
+                  {
+                    amount: {
+                      value: "74.90", // Replace with dynamic total
+                    },
+                  },
+                ],
+              });
+            }}
+            onApprove={(data, actions) => {
+              return actions.order.capture().then((details) => {
+                alert("Transaction completed by " + details.payer.name.given_name);
+              });
+            }}
+          />
+        </PayPalScriptProvider>
+      )}
+
+      {errors && <p className="text-red-500 text-sm">{errors.metodoPago}</p>}
     </div>
   );
 };
