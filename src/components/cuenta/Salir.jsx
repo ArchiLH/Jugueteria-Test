@@ -1,16 +1,40 @@
-import { useNavigate } from "react-router-dom";
 import { autenticacionUsuario } from "../../context/AuthContext";
-
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 function Salir() {
   const navigate = useNavigate();
   const { logout } = autenticacionUsuario();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = () => {
-    const confirmar = window.confirm("¿Estás seguro que deseas cerrar sesión?");
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    const toastId = toast.loading("Cerrando sesión...");
 
-    if (confirmar) {
-      logout();
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simular delay
+      await logout();
+
+      // Actualizar toast a éxito
+      toast.update(toastId, {
+        render: "¡Sesión cerrada exitosamente!",
+        type: "success",
+        isLoading: false,
+        autoClose: 2000,
+      });
+
       navigate("/");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      // Actualizar toast a error
+      toast.update(toastId, {
+        render: "Error al cerrar sesión",
+        type: "error",
+        isLoading: false,
+        autoClose: 2000,
+      });
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -31,13 +55,14 @@ function Salir() {
         <div className="space-y-4">
           <button
             onClick={handleLogout}
+            disabled={isLoggingOut}
             className="w-full bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           >
             Cerrar Sesión
           </button>
 
           <button
-            onClick={() => navigate("/mi-cuenta")}
+            onClick={() => navigate("/")}
             className="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
           >
             Cancelar

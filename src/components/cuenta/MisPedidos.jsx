@@ -1,60 +1,39 @@
+import { Link } from "react-router-dom";
+import { BiTask } from "react-icons/bi";
+
 function MisPedidos() {
-  const pedidos = [
-    {
-      id: "1",
-      fecha: "2024-01-15",
-      total: 299.99,
-      estado: ["Entregado", "Pendiente"],
-      productos: [{ nombre: "Juguete 1", cantidad: 2, precio: 149.99 }],
-    },
-    // Más pedidos...
-  ];
+  const pedidos = []; // Array vacío para simular que no hay pedidos
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <h2 className="text-xl font-semibold mb-6">Mis Pedidos</h2>
 
-      <div className="space-y-4">
-        {pedidos.map((pedido) => (
-          <div key={pedido.id} className="border rounded-lg p-4">
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <span className="font-medium">Pedido #{pedido.id}</span>
-                <p className="text-sm text-gray-600">
-                  {new Date(pedido.fecha).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="text-right">
-                <span className="font-medium">S/. {pedido.total}</span>
-                <p
-                  className={`text-sm ${
-                    pedido.estado === "Entregado"
-                      ? "text-green-500"
-                      : "text-blue-500"
-                  }`}
-                >
-                  {pedido.estado[1]}
-                </p>
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              {pedido.productos.map((producto, index) => (
-                <div key={index} className="flex justify-between items-center">
-                  <span>
-                    {producto.nombre} x{producto.cantidad}
-                  </span>
-                  <span>S/. {producto.precio * producto.cantidad}</span>
-                </div>
-              ))}
-            </div>
-
-            <button className="mt-4 text-green-500 hover:text-green-600">
-              Ver detalles
-            </button>
+      {pedidos.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="mb-4">
+            <BiTask className="mx-auto h-12 w-12 text-gray-400" />
           </div>
-        ))}
-      </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Aún no tienes pedidos realizados
+          </h3>
+          <p className="text-gray-500 mb-4">
+            Realiza tu primera compra y podrás ver tus pedidos aquí
+          </p>
+          <Link
+            to="/product-catalog"
+            className="inline-flex items-center px-4 py-2 border border-transparent
+                     rounded-md shadow-sm text-sm font-medium text-white
+                     bg-green-600 hover:bg-green-700 transition-colors duration-200"
+          >
+            Ir a Comprar
+          </Link>
+        </div>
+      ) : (
+        // Aquí irá el código para mostrar la lista de pedidos cuando existan
+        <div className="space-y-4">
+          {/* El mapeo de pedidos irá aquí cuando se implemente */}
+        </div>
+      )}
     </div>
   );
 }

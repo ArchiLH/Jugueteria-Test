@@ -6,7 +6,7 @@ const PaymentForm = ({ formData, handleChange, errors }) => {
         <h3 className="font-semibold mb-4">Método de Pago</h3>
 
         <div className="space-y-4">
-          <div className="flex items-center p-3 border rounded-md bg-white">
+          {/* <div className="flex items-center p-3 border rounded-md bg-white">
             <input
               type="radio"
               id="debito"
@@ -25,10 +25,10 @@ const PaymentForm = ({ formData, handleChange, errors }) => {
                 <img src="/mastercard.svg" alt="Mastercard" className="h-6" />
               </div>
             </label>
-          </div>
+          </div> */}
 
           {/* PayPal */}
-        <div className="flex items-center p-3 border rounded-md bg-white">
+          <div className="flex items-center p-3 border rounded-md bg-white">
             <input
               type="radio"
               id="paypal"
@@ -50,9 +50,12 @@ const PaymentForm = ({ formData, handleChange, errors }) => {
 
       {/* Render PayPal Buttons if PayPal is selected */}
       {formData.metodoPago === "paypal" && (
-        <PayPalScriptProvider options={{ "client-id": "AfQTM5li-eR22K84cV89UkywMGGwglRx7xZjXR1P DzQQNbL-171MwtrC-NNIADeQVfvXy5qEWxIRphPF"
-         
-         }}>
+        <PayPalScriptProvider
+          options={{
+            "client-id":
+              "AfQTM5li-eR22K84cV89UkywMGGwglRx7xZjXR1P DzQQNbL-171MwtrC-NNIADeQVfvXy5qEWxIRphPF",
+          }}
+        >
           <PayPalButtons
             style={{ layout: "vertical" }}
             createOrder={(data, actions) => {
@@ -68,7 +71,9 @@ const PaymentForm = ({ formData, handleChange, errors }) => {
             }}
             onApprove={(data, actions) => {
               return actions.order.capture().then((details) => {
-                alert("Transaction completed by " + details.payer.name.given_name);
+                alert(
+                  "Transaction completed by " + details.payer.name.given_name,
+                );
               });
             }}
           />

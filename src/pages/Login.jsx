@@ -2,29 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { autenticacionUsuario } from "../context/AuthContext";
 import { loginUser } from "../api/Autenticacion";
-
-// Componente reutilizable para un campo de entrada
-function InputField({ id, label, type, value, onChange, placeholder }) {
-  return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <div className="mt-1">
-        <input
-          id={id}
-          name={id}
-          type={type}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          required
-          className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
-        />
-      </div>
-    </div>
-  );
-}
+import { Input } from "../components/ui/Input";
+import { toast } from "react-toastify";
 
 // Componente principal de login
 function Login() {
@@ -36,15 +15,26 @@ function Login() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
+    setError(""); // Limpiar error cuando el usuario empiece a escribir
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+    try {
+      e.preventDefault();
+      setError("");
+      toast.success("¡Inicio de sesión exitoso!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      navigate("/");
+    } catch (error) {
+      toast.error(error.message || "Error al iniciar sesión");
+    }
 
     try {
       const userData = await loginUser(formData); // Llamada al API para obtener los datos del usuario
-      if (!userData.token) throw new Error("No se recibió el token de autenticación");
+      if (!userData.token)
+        throw new Error("No se recibió el token de autenticación");
 
       // Almacenar el token, username y userId en el localStorage
       if (userData.token) {
@@ -70,32 +60,45 @@ function Login() {
   return (
     <div className="flex items-center justify-center bg-gray-100 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
-        <h2 className="text-center text-2xl font-bold text-gray-900">Iniciar sesión</h2>
+        <h2 className="text-center text-2xl font-bold text-gray-900">
+          Iniciar sesión
+        </h2>
+
         <div className="bg-white rounded-lg shadow px-6 py-8 sm:px-8">
-          {error && <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{error}</div>}
+          {error && (
+            <div className="mb-4 p-2 bg-red-100 text-red-700 rounded text-sm">
+              {error}
+            </div>
+          )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <InputField
-              id="username" // Cambié 'email' por 'username'
+            <Input
               label="Nombre de Usuario:"
-              type="text" // Cambié 'username' por 'text' en el tipo
-              placeholder="Ingresa tu nombre de usuario"
-              value={formData.username} // Usando 'username'
+              name="username"
+              type="text"
+              value={formData.username}
               onChange={handleChange}
+              placeholder="Ingresa tu nombre de usuario"
+              required
+              error={error && error.includes("usuario") ? error : ""}
             />
-            <InputField
-              id="password"
+
+            <Input
               label="Contraseña"
+              name="password"
               type="password"
-              placeholder="Ingresa tu contraseña"
               value={formData.password}
               onChange={handleChange}
+              placeholder="Ingresa tu contraseña"
+              required
+              error={error && error.includes("contraseña") ? error : ""}
             />
+
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200"
             >
-              Iniciar sesión
+              Iniciar Sesion
             </button>
           </form>
 

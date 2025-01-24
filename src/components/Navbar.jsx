@@ -1,14 +1,18 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { FaShoppingCart, FaRegHeart } from "react-icons/fa";
+import { FaShoppingCart, FaUserCircle, FaRegHeart } from "react-icons/fa";
 import { FiUser, FiShoppingCart, FiMenu, FiX } from "react-icons/fi";
 import BannerCotiza from "./BannerCotiza";
 import { autenticacionUsuario } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, logout } = autenticacionUsuario(); // Obtén el usuario y la función logout del contexto
+  const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -18,9 +22,36 @@ function Navbar() {
     setIsUserMenuOpen(!isUserMenuOpen);
   };
 
-  const handleLogout = () => {
-    logout();
-    setIsUserMenuOpen(false);
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    const toastId = toast.loading("Cerrando sesión...");
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simular delay
+      await logout();
+      setIsUserMenuOpen(false);
+
+      // Actualizar toast a éxito
+      toast.update(toastId, {
+        render: "¡Sesión cerrada exitosamente!",
+        type: "success",
+        isLoading: false,
+        autoClose: 1000,
+      });
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      // Actualizar toast a error
+      toast.update(toastId, {
+        render: "Error al cerrar sesión",
+        type: "error",
+        isLoading: false,
+        autoClose: 2000,
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -76,7 +107,11 @@ function Navbar() {
                   onClick={toggleUserMenu}
                   className="text-gray-700 hover:text-primary focus:outline-none"
                 >
-                  <FiUser className="text-xl" />
+                  {user ? (
+                    <FaUserCircle className="text-2xl text-primary" /> // Icono para usuario logueado
+                  ) : (
+                    <FiUser className="text-xl" /> // Icono para usuario no logueado
+                  )}
                 </button>
 
                 {/* Menú desplegable del usuario: mi cuenta y cerrar sesion */}
@@ -93,6 +128,7 @@ function Navbar() {
                         </Link>
                         <button
                           onClick={handleLogout}
+                          disabled={isLoggingOut}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           Cerrar Sesión
@@ -165,6 +201,7 @@ function Navbar() {
                     </Link>
                     <button
                       onClick={handleLogout}
+                      disabled={isLoggingOut}
                       className="block w-full text-left px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50"
                     >
                       Cerrar Sesión

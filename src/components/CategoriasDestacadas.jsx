@@ -19,7 +19,7 @@ function CategoriasDestacadas() {
               Construye tu imaginación
             </p>
             <Link
-              to=""
+              to="product-catalog"
               className="inline-flex items-center px-4 py-2 bg-white text-green-500 border border-green-500 hover:bg-green-500 hover:text-white rounded-lg transition duration-200"
             >
               Explorar →
@@ -39,7 +39,7 @@ function CategoriasDestacadas() {
               Aprende mientras juegas
             </p>
             <Link
-              to=""
+              to="product-catalog"
               className="inline-flex items-center px-4 py-2 bg-white text-green-500 border border-green-500 hover:bg-green-500 hover:text-white rounded-lg transition duration-200"
             >
               Explorar →
@@ -57,7 +57,7 @@ function CategoriasDestacadas() {
             <h3 className="text-lg font-semibold mb-2">Figuras de Accion</h3>
             <p className="text-sm text-gray-600 mb-4">Figuras Coleccionables</p>
             <Link
-              to=""
+              to="product-catalog"
               className="inline-flex items-center px-4 py-2 bg-white text-green-500 border border-green-500 hover:bg-green-500 hover:text-white rounded-lg transition duration-200"
             >
               Explorar →
