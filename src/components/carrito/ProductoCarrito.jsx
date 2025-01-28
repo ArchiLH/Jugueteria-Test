@@ -1,29 +1,19 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaTrashAlt, FaMinus, FaPlus } from "react-icons/fa";
 
 function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
   const [isUpdating, setIsUpdating] = useState(false);
+  const MAX_QUANTITY = 5;
 
-  // Función para decrementar cantidad
   const decrementQuantity = () => {
     if (producto.quantity > 1) {
-      onUpdateQuantity(producto.quantity - 1);
+      handleQuantityUpdate(producto.quantity - 1);
     }
   };
 
-  // Función para incrementar cantidad
-  const MAX_QUANTITY = 5;
   const incrementQuantity = () => {
     if (producto.quantity < MAX_QUANTITY) {
-      onUpdateQuantity(producto.quantity + 1);
-    }
-  };
-
-  // Función para manejar el cambio manual de cantidad
-  const handleQuantityChange = (e) => {
-    const newQuantity = parseInt(e.target.value);
-    if (newQuantity > 0 && newQuantity <= MAX_QUANTITY) {
-      handleQuantityUpdate(newQuantity);
+      handleQuantityUpdate(producto.quantity + 1);
     }
   };
 
@@ -46,7 +36,7 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
         <div className="flex items-center mt-2">
           <button
             onClick={decrementQuantity}
-            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 transition-colors"
+            className="px-3 py-1 bg-gray-100 hover:bg-gray-200"
             disabled={producto.quantity <= 1}
           >
             <FaMinus className="w-3 h-3" />
@@ -57,15 +47,13 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
             min="1"
             max={MAX_QUANTITY}
             value={producto.quantity}
-            onChange={handleQuantityChange}
-            className="w-16 text-center border-x px-2 py-1 focus:outline-none"
-            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => handleQuantityUpdate(Number(e.target.value))}
+            className="w-16 text-center border-x px-2 py-1"
           />
 
           <button
             onClick={incrementQuantity}
-            disabled={producto.quantity >= MAX_QUANTITY}
-            className={`px-3 py-1 transition-colors ${
+            className={`px-3 py-1 ${
               producto.quantity >= MAX_QUANTITY
                 ? "bg-gray-200 cursor-not-allowed"
                 : "bg-gray-100 hover:bg-gray-200"
@@ -86,11 +74,7 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
         <p className="text-sm text-gray-500">
           S/ {producto.price.toFixed(2)} x {producto.quantity}
         </p>
-        <p
-          className={`font-bold text-lg ${
-            isUpdating ? "text-yellow-600" : "text-green-600"
-          } transition-colors`}
-        >
+        <p className="font-bold text-lg text-green-600">
           S/ {(producto.price * producto.quantity).toFixed(2)}
         </p>
       </div>

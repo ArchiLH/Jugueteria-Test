@@ -6,6 +6,7 @@ import BannerCotiza from "./BannerCotiza";
 import { autenticacionUsuario } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useCart } from "../context/CartContext"; // Asegúrate de importar el contexto de carrito
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,6 +14,9 @@ function Navbar() {
   const { user, logout } = autenticacionUsuario(); // Obtén el usuario y la función logout del contexto
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  // Obtener los datos del carrito desde el contexto
+  const { totalQuantity } = useCart(); // Usamos totalQuantity del contexto de carrito
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -150,8 +154,15 @@ function Navbar() {
               <Link to="favoritos" className="text-gray-700 hover:text-primary">
                 <FaRegHeart className="text-xl" />
               </Link>
-              <Link to="carrito" className="text-gray-700 hover:text-primary">
+
+              {/* Icono de carrito con cantidad */}
+              <Link to="carrito" className="text-gray-7000 hover:text-primary relative">
                 <FiShoppingCart className="text-xl" />
+                {totalQuantity > 0 && (
+                  <span className="absolute bottom-2 left-4 text-xs text-white bg-gray-500 rounded-full w-5 h-5 flex items-center justify-center">
+                    {totalQuantity}
+                  </span>
+                )}
               </Link>
 
               {/* Icono de menú para móvil */}
