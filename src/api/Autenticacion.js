@@ -1,10 +1,13 @@
 export const loginUser = async (credentials) => {
+  // manejo de errores
   try {
+    // Realizar la solicitud de inicio de sesión al servidor 
     const response = await fetch("http://localhost:8080/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      // aqui se envian las credenciales del usuario
       body: JSON.stringify({
         username: credentials.username, // Usamos 'username' en lugar de 'email'
         password: credentials.password,

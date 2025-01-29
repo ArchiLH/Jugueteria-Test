@@ -4,6 +4,7 @@ import { CheckoutProvider } from "./CheckoutContext";
 
 export function AppProviders({ children }) {
   return (
+    
     <CartProvider>
       <FavoritosProvider>
         <CheckoutProvider>{children}</CheckoutProvider>

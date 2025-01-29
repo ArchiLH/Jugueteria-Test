@@ -10,9 +10,11 @@ const initialState = {
   totalQuantity: 0,
 };
 
-// Reducer para manejar las acciones
+// Función para calcular el subtotal del carrito
 function cartReducer(state, action) {
+  // switch para manejar las acciones del carrito 
   switch (action.type) {
+    // caso para agregar un item al carrito 
     case "ADD_ITEM": {
       const existingItem = state.cart.find((item) => item.id === action.payload.id);
 
@@ -34,6 +36,7 @@ function cartReducer(state, action) {
       };
     }
 
+    // caso para eliminar un item del carrito 
     case "REMOVE_ITEM": {
       const filteredCart = state.cart.filter((item) => item.id !== action.payload);
       const totalQuantity = filteredCart.reduce((total, item) => total + item.quantity, 0);
@@ -46,6 +49,7 @@ function cartReducer(state, action) {
       };
     }
 
+    // caso para actualizar la cantidad de un item en el carrito
     case "UPDATE_QUANTITY": {
       const updatedCartQuantity = state.cart.map((item) =>
         item.id === action.payload.itemId
@@ -62,6 +66,7 @@ function cartReducer(state, action) {
       };
     }
 
+    // caso para vaciar el carrito cuando se completa la compra
     case "CLEAR_CART": {
       return {
         ...state,

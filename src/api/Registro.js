@@ -1,5 +1,6 @@
 export const registerUser = async (userData) => {
   try {
+    // Realiza la solicitud POST a la API de registro con los datos del usuario
     const response = await fetch("http://localhost:8080/auth/register", {
       method: "POST",
       headers: {
