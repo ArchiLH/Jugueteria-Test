@@ -24,6 +24,7 @@ function Filtros({ filters, handleFilterChange }) {
     { id: 4, range: "200-500" },
   ];
 
+  // Función para manejar el cambio de filtros de las categorías 
   const renderCategoriasCheckboxes = () => {
     return categorias.map((item) => (
       <li key={item.id} className="flex items-center mb-2">
@@ -31,9 +32,9 @@ function Filtros({ filters, handleFilterChange }) {
           type="checkbox"
           id={item.id}
           value={item.name}
-          checked={filters.categorias.includes(item.name)}
+          checked={filters.categorias.includes(item.name)} // Verifica si la categoría está seleccionada 
           onChange={() => {
-            handleFilterChange("categorias", item.name);
+            handleFilterChange("categorias", item.name); 
           }}
           className="mr-2"
         />
@@ -44,6 +45,7 @@ function Filtros({ filters, handleFilterChange }) {
     ));
   };
 
+  // Función para manejar el cambio de filtros de las marcas
   const renderMarcasCheckboxes = () => {
     return marcas.map((item) => (
       <li key={item.id} className="flex items-center mb-2">
@@ -62,6 +64,7 @@ function Filtros({ filters, handleFilterChange }) {
     ));
   };
 
+  // Función para manejar el cambio de filtros de los precios
   const renderPreciosCheckboxes = () => {
     return precios.map((item) => (
       <li key={item.id} className="flex items-center mb-2">
@@ -88,17 +91,17 @@ function Filtros({ filters, handleFilterChange }) {
 
       <div className="mb-6">
         <h3 className="font-semibold mb-2">Categorías</h3>
-        <ul>{renderCategoriasCheckboxes()}</ul>
+        <ul>{renderCategoriasCheckboxes()}</ul> {/* Renderiza las categorías */}
       </div>
 
       <div className="mb-6">
         <h3 className="font-semibold mb-2">Marcas</h3>
-        <ul>{renderMarcasCheckboxes()}</ul>
+        <ul>{renderMarcasCheckboxes()}</ul> {/* Renderiza las marcas */}
       </div>
 
       <div className="mb-6">
         <h3 className="font-semibold mb-2">Precio</h3>
-        <ul>{renderPreciosCheckboxes()}</ul>
+        <ul>{renderPreciosCheckboxes()}</ul>  {/* Renderiza los precios */}
       </div>
     </aside>
   );

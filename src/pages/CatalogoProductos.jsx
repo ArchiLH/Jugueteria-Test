@@ -4,16 +4,23 @@ import Filtros from "../components/catalogo/Filtros";
 import BannerCategoria from "../components/banner/BannerCategoria";
 
 function CatalogoProductos() {
-  const [products, setProducts] = useState([]);
+  // Estado para los productos siginifica que se inicializa con un array vacio y se usa para actualizar los productos vienen de la API
+  const [products, setProducts] = useState([]);  
+  // Estado para los filtros, se inicializa con un objeto vacio y se usa para actualizar los filtros
   const [filters, setFilters] = useState({
     categorias: [],
     marcas: [],
     precio: [],
   });
-  const [orden, setOrden] = useState("");
-  const [error, setError] = useState(null);
+  const [orden, setOrden] = useState("");  // Estado para el orden de los productos
+  const [error, setError] = useState(null); // Estado para manejar errores
 
-  // Obtener productos desde la API
+ 
+  // se usa useEffect para que se ejecute una vez que se renderiza el componente y se usa fetch para hacer la solicitud a la API 
+  // y se usa then para manejar la respuesta y catch para manejar el error 
+  // y se usa setProducts para actualizar el estado de los productos significa que se actualiza el estado de los productos con los datos que se obtienen de la API
+  // y se usa Array.isArray para verificar que los datos sean un array y si no lo son se muestra un error 
+  // y se usa setError para actualizar el estado del error y mostrar el error en la consola 
   useEffect(() => {
     fetch("http://localhost:8080/api/productos")
       .then((response) => {
@@ -34,6 +41,7 @@ function CatalogoProductos() {
       );
   }, []);
 
+  // Función para manejar el cambio de filtros de categoría, marca y precio esto es para que se pueda seleccionar y deseleccionar los filtros
   const handleFilterChange = (filterType, value) => {
     setFilters((prevFilters) => {
       const array = [...prevFilters[filterType]];
@@ -66,19 +74,21 @@ function CatalogoProductos() {
 
     let filteredProducts = products;
 
-    // Filtros de categorías, marcas y precio
+    // Filtros de categorías
     if (filters.categorias.length > 0) {
       filteredProducts = filteredProducts.filter((product) =>
         filters.categorias.includes(product.categoria),
       );
     }
 
+    // Filtro de marcas 
     if (filters.marcas.length > 0) {
       filteredProducts = filteredProducts.filter((product) =>
         filters.marcas.includes(product.brand),
       );
     }
 
+    // Filtro de precio
     if (filters.precio.length > 0) {
       filteredProducts = filteredProducts.filter((product) => {
         const price = parseFloat(product.price);
@@ -99,8 +109,9 @@ function CatalogoProductos() {
     return filteredProducts;
   };
 
-  const filteredProducts = filterProducts();
+  const filteredProducts = filterProducts(); // Obtener los productos filtrados
 
+  // Renderizar los productos 
   if (error) {
     return <div>{error}</div>;
   }
