@@ -1,4 +1,4 @@
-
+// funciona para mostrar el banner de la categoria tiene parametros de entrada url_imagen y nombreCategoria que son los datos de la categoria que se quiere mostrar en el banner
 function BannerCategoria({ url_imagen, nombreCategoria }) {
   return (
     <div className="relative w-full overflow-hidden">

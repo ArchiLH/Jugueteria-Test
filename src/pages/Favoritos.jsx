@@ -1,7 +1,7 @@
 import React from "react";
 import { useFavoritos } from "../context/FavoritosContext";
 import { useCart } from "../context/CartContext";
-import BannerCategoria from "../components/BannerCategoria";
+import BannerCategoria from "../components/banner/BannerCategoria";
 import { FaTrashAlt, FaShoppingCart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 

@@ -6,8 +6,8 @@ import Registro from "./pages/Registro";
 import Login from "./pages/Login";
 import MiCuenta from "./pages/MiCuenta";
 import { AuthProvider } from "./context/AuthContext";
-import NotFound from "./components/NotFound404";
-import UnderConstruction from "./components/UnderConstruction";
+import NotFound from "./components/404/NotFound404";
+import UnderConstruction from "./components/404/UnderConstruction";
 import ProductDetail from "./components/catalogo/ProductDetail";
 import Carrito from "./pages/Carrito";
 import Checkout from "./pages/Checkout"; // Asegúrate de que este componente esté importado

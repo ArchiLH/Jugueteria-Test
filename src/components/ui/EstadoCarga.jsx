@@ -1,4 +1,4 @@
-export const LoadingSpinner = ({ size = "medium" }) => {
+/* export const LoadingSpinner = ({ size = "medium" }) => {
   const sizeClasses = {
     small: "h-4 w-4",
     medium: "h-6 w-6",
@@ -12,3 +12,4 @@ export const LoadingSpinner = ({ size = "medium" }) => {
     />
   );
 };
+ */

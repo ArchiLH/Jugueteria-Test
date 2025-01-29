@@ -1,7 +1,7 @@
 import { useCart } from "../context/CartContext";
 import Producto from "../components/carrito/ProductoCarrito";
 import Resumen from "../components/carrito/ResumenCarrito";
-import BannerCategoria from "../components/BannerCategoria";
+import BannerCategoria from "../components/banner/BannerCategoria";
 import BotonCheckout from "../components/carrito/BotonCheckout";
 // import { useState } from "react";
 

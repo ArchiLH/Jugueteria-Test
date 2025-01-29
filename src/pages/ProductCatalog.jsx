@@ -1,16 +1,16 @@
-import React from "react";
+/* import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./Catalogo.css";
 
 const Catalogo = () => {
   const navigate = useNavigate();  // Hook de React Router para redirigir
-  const productos = [ /* tu lista de productos */ ];
+  const productos = [  ];
 
-  const handleClickProducto = (id) => {
-    navigate(`/product/${id}`);  // Redirigir a la página del producto
-  };
+  /* const handleClickProducto = (id) => {
+    navigate(`/product/${id}`); 
+  }; */
 
-  return (
+/*   return (
     <div className="catalogo-container">
       <header className="catalogo-header">
         <h1>Catálogo</h1>
@@ -42,6 +42,6 @@ const Catalogo = () => {
       </div>
     </div>
   );
-};
+}; */
 
-export default Catalogo;
+/* export default Catalogo; */

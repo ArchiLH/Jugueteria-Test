@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "../components/catalogo/ProductCard";
 import Filtros from "../components/catalogo/Filtros";
+import BannerCategoria from "../components/banner/BannerCategoria";
 
 function CatalogoProductos() {
   const [products, setProducts] = useState([]);
@@ -93,7 +94,9 @@ function CatalogoProductos() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+    <BannerCategoria url_imagen="https://images.unsplash.com/photo-1558060370-d644479cb6f7?q=80&w=2128&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"  nombreCategoria="Catalogo de Juguetes"/>
+      <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Catálogo</h1>
         <div className="flex items-center">
@@ -127,6 +130,8 @@ function CatalogoProductos() {
         </section>
       </div>
     </div>
+    </>
+    
   );
 }
 

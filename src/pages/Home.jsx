@@ -1,6 +1,6 @@
-import Hero from "../components/Hero";
-import BrandSection from "../components/BrandSection";
-import CategoriasDestacadas from "../components/CategoriasDestacadas";
+import Hero from "../components/home/Hero";
+import BrandSection from "../components/home/BrandSection";
+import CategoriasDestacadas from "../components/home/CategoriasDestacadas";
 
 function Home() {
   return (

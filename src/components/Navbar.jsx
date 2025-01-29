@@ -1,39 +1,43 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { FaShoppingCart, FaUserCircle, FaRegHeart } from "react-icons/fa";
+import { FaUserCircle, FaRegHeart } from "react-icons/fa";
 import { FiUser, FiShoppingCart, FiMenu, FiX } from "react-icons/fi";
-import BannerCotiza from "./BannerCotiza";
+import BannerCotiza from "./banner/BannerCotiza";
 import { autenticacionUsuario } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useCart } from "../context/CartContext"; // Asegúrate de importar el contexto de carrito
 
 function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para controlar la apertura del menú 
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // Estado para controlar la apertura del menú de usuario
   const { user, logout } = autenticacionUsuario(); // Obtén el usuario y la función logout del contexto
-  const navigate = useNavigate();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const navigate = useNavigate(); // Hook de navegación 
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // Estado para controlar el proceso de cierre de sesión
   
   // Obtener los datos del carrito desde el contexto
   const { totalQuantity } = useCart(); // Usamos totalQuantity del contexto de carrito
 
+  // Funciones para abrir y cerrar el menú
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // Funciones para abrir y cerrar el menú de usuario cuenta
   const toggleUserMenu = () => {
     setIsUserMenuOpen(!isUserMenuOpen);
   };
 
+  // Función para cerrar sesión
   const handleLogout = async () => {
-    setIsLoggingOut(true);
-    const toastId = toast.loading("Cerrando sesión...");
+    setIsLoggingOut(true);  // Iniciar el proceso de cierre de sesión 
+    const toastId = toast.loading("Cerrando sesión..."); // Mostrar toast de carga
 
+    // Simular un delay de 1 segundo antes de cerrar sesión
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simular delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       await logout();
-      setIsUserMenuOpen(false);
+      setIsUserMenuOpen(false);  // Cerrar el menú de usuario cuenta
 
       // Actualizar toast a éxito
       toast.update(toastId, {
@@ -43,7 +47,7 @@ function Navbar() {
         autoClose: 1000,
       });
 
-      navigate("/");
+      navigate("/");  // Redirigir al usuario a la página de inicio
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       // Actualizar toast a error

@@ -6,6 +6,7 @@ function BotonCheckout() {
   const navigate = useNavigate();
   const { user } = autenticacionUsuario();
 
+  // Función para manejar el clic en el botón de checkout y redirigir al usuario a la página de checkout o al login si no está autenticado
   const handleCheckoutClick = () => {
     if (!user) {
       toast.error("Necesitas Iniciar Sesion para realizar la compra", {
