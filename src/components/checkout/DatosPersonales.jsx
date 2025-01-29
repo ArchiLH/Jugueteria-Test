@@ -33,7 +33,7 @@ const DatosPersonales = ({ errors, handleChange }) => {
             headers: {
               Authorization: `Bearer ${token}`, // Agregar token en el encabezado
             },
-          }
+          },
         );
 
         if (!response.ok) {
@@ -98,7 +98,7 @@ const DatosPersonales = ({ errors, handleChange }) => {
         <Input
           label="Teléfono"
           type="tel"
-          name="telefono"
+          name="phone"
           placeholder="Ingrese su Teléfono"
           value={formData.phone}
           onChange={handleChange}

@@ -10,7 +10,7 @@ export const validateDNI = (dni) => {
   return /^\d{8}$/.test(dni);
 };
 
-export const errorMessages = {
+/* export const errorMessages = {
   username: {
     required: "El nombre de usuario es requerido",
     invalid:
@@ -35,4 +35,4 @@ export const errorMessages = {
     required: "El DNI es requerido",
     invalid: "El DNI debe tener 8 dígitos",
   },
-};
+}; */
