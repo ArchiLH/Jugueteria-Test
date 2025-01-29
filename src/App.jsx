@@ -1,17 +1,17 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom"; // Importar Routes y Route de react-router-dom para definir las rutas de la aplicación 
 import Navbar from "./components/navbar/Navbar";
 import Footer from "./components/footer/Footer";
 import Home from "./pages/Home";
 import Registro from "./pages/Registro";
 import Login from "./pages/Login";
 import MiCuenta from "./pages/MiCuenta";
-import { AuthProvider } from "./context/AuthContext";
-import NotFound from "./components/404/NotFound404";
+import { AuthProvider } from "./context/AuthContext"; // Importar AuthProvider para proveer el contexto de autenticación a la aplicación 
+import NotFound from "./components/404/NotFound404"; 
 import UnderConstruction from "./components/404/UnderConstruction";
 import ProductDetail from "./components/catalogo/ProductDetail";
 import Carrito from "./pages/Carrito";
 import Checkout from "./pages/Checkout"; // Asegúrate de que este componente esté importado
-import { AppProviders } from "./context/AppProviders";
+import { AppProviders } from "./context/AppProviders"; // Importar AppProviders para proveer el contexto de la aplicación 
 import ConfirmacionOrden from "./components/checkout/ConfirmacionOrden";
 import CatalogoProductos from "./pages/CatalogoProductos";
 import Favoritos from "./pages/Favoritos";
