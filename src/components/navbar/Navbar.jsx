@@ -2,11 +2,11 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { FaUserCircle, FaRegHeart } from "react-icons/fa";
 import { FiUser, FiShoppingCart, FiMenu, FiX } from "react-icons/fi";
-import BannerCotiza from "./banner/BannerCotiza";
-import { autenticacionUsuario } from "../context/AuthContext";
+import BannerCotiza from "../banner/BannerCotiza";
+import { autenticacionUsuario } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useCart } from "../context/CartContext"; // Asegúrate de importar el contexto de carrito
+import { useCart } from "../../context/CartContext"; // Asegúrate de importar el contexto de carrito
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para controlar la apertura del menú 

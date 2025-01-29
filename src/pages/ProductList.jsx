@@ -1,4 +1,4 @@
-import React from "react";
+/* import React from "react";
 import { useNavigate } from "react-router-dom";
 import { productos } from "../data/productos";
 
@@ -36,4 +36,4 @@ function ProductList() {
   );
 }
 
-export default ProductList;
+export default ProductList; */
