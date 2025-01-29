@@ -29,22 +29,38 @@ function CatalogoProductos() {
           setError("Los datos de productos no son válidos.");
         }
       })
-      .catch((error) => setError(`Error al obtener los productos: ${error.message}`));
+      .catch((error) =>
+        setError(`Error al obtener los productos: ${error.message}`),
+      );
   }, []);
 
   const handleFilterChange = (filterType, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [filterType]: prevFilters[filterType].includes(value)
-        ? prevFilters[filterType].filter((item) => item !== value)
-        : [...prevFilters[filterType], value],
-    }));
+    setFilters((prevFilters) => {
+      const array = [...prevFilters[filterType]];
+      const index = array.findIndex((item) => {
+        if (filterType === "categorias") return item === value;
+        if (filterType === "marcas") return item === value;
+        if (filterType === "precio") return item === value;
+        return false;
+      });
+      if (index !== -1) {
+        array.splice(index, 1);
+      } else {
+        array.push(value);
+      }
+      return {
+        ...prevFilters,
+        [filterType]: array,
+      };
+    });
   };
 
+  // Función para manejar el cambio de orden
   const handleOrdenChange = (event) => {
     setOrden(event.target.value);
   };
 
+  // Función para filtrar y ordenar los productos
   const filterProducts = () => {
     if (products.length === 0) return []; // Retorna un array vacío si no hay productos aún
 
@@ -53,13 +69,13 @@ function CatalogoProductos() {
     // Filtros de categorías, marcas y precio
     if (filters.categorias.length > 0) {
       filteredProducts = filteredProducts.filter((product) =>
-        filters.categorias.includes(product.categoria)
+        filters.categorias.includes(product.categoria),
       );
     }
 
     if (filters.marcas.length > 0) {
       filteredProducts = filteredProducts.filter((product) =>
-        filters.marcas.includes(product.brand)
+        filters.marcas.includes(product.brand),
       );
     }
 
@@ -95,43 +111,47 @@ function CatalogoProductos() {
 
   return (
     <>
-    <BannerCategoria url_imagen="https://images.unsplash.com/photo-1558060370-d644479cb6f7?q=80&w=2128&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"  nombreCategoria="Catalogo de Juguetes"/>
+      <BannerCategoria
+        url_imagen="https://images.unsplash.com/photo-1558060370-d644479cb6f7?q=80&w=2128&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        nombreCategoria="Catalogo de Juguetes"
+      />
       <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Catálogo</h1>
-        <div className="flex items-center">
-          <label htmlFor="ordenar" className="mr-2 text-gray-600">
-            Ordenar por:
-          </label>
-          <select
-            id="ordenar"
-            className="border border-gray-300 rounded px-3 py-1"
-            value={orden}
-            onChange={handleOrdenChange}
-          >
-            <option value="">Seleccione una opción</option>
-            <option value="menor-mayor">Precio: menor a mayor</option>
-            <option value="mayor-menor">Precio: mayor a menor</option>
-          </select>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Catálogo</h1>
+          <div className="flex items-center">
+            <label htmlFor="ordenar" className="mr-2 text-gray-600">
+              Ordenar por:
+            </label>
+            <select
+              id="ordenar"
+              className="border border-gray-300 rounded px-3 py-1"
+              value={orden}
+              onChange={handleOrdenChange}
+            >
+              <option value="">Seleccione una opción</option>
+              <option value="menor-mayor">Precio: menor a mayor</option>
+              <option value="mayor-menor">Precio: mayor a menor</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="flex">
+          {/* Filtros para el catálogo  */}
+          <Filtros filters={filters} handleFilterChange={handleFilterChange} />
+
+          {/* Lista de productos */}
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow ml-4">
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              <p>No se encontraron productos</p>
+            )}
+          </section>
         </div>
       </div>
-
-      <div className="flex">
-        <Filtros filters={filters} handleFilterChange={handleFilterChange} />
-
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow ml-4">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          ) : (
-            <p>No se encontraron productos</p>
-          )}
-        </section>
-      </div>
-    </div>
     </>
-    
   );
 }
 
