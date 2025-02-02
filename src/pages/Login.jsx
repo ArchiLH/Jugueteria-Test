@@ -10,7 +10,7 @@ function Login() {
   const navigate = useNavigate();
   const { login } = autenticacionUsuario();
   const [formData, setFormData] = useState({ username: "", password: "" }); // Mantener 'username'
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); // Estado para manejar errores
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,18 +18,12 @@ function Login() {
     setError(""); // Limpiar error cuando el usuario empiece a escribir
   };
 
+
+
   const handleSubmit = async (e) => {
-    try {
-      e.preventDefault();
-      setError("");
-      toast.success("¡Inicio de sesión exitoso!", {
-        position: "top-right",
-        autoClose: 2000,
-      });
-      navigate("/");
-    } catch (error) {
-      toast.error(error.message || "Error al iniciar sesión");
-    }
+    e.preventDefault();
+    setError("");
+    const toastId = toast.loading("Iniciando sesión...");
 
     try {
       const userData = await loginUser(formData); // Llamada al API para obtener los datos del usuario
@@ -50,10 +44,25 @@ function Login() {
         userId: userData.userId, // Añadimos el userId al estado global
       });
 
-      navigate("/"); // Redirigir a la página principal después de login exitoso
+
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simular una espera de 1 segundo
+      toast.update(toastId, {
+        render: "¡Inicio de sesión exitosamente!",
+        type: "success",
+        isLoading: false,
+        autoClose: 1000,
+      });
+
+      navigate("/mi-cuenta"); // Redirigir a la página principal después de login exitoso
     } catch (error) {
       console.error("Error en login:", error);
-      setError(error.message || "Error al iniciar sesión");
+      // setError(error.message || "Error al iniciar sesión");
+      toast.update(toastId, {
+        render: "Credenciales incorrectas. Inténtalo de nuevo.",
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
+      });
     }
   };
 
@@ -65,11 +74,11 @@ function Login() {
         </h2>
 
         <div className="bg-white rounded-lg shadow px-6 py-8 sm:px-8">
-          {error && (
+          {/* {error && (
             <div className="mb-4 p-2 bg-red-100 text-red-700 rounded text-sm">
               {error}
             </div>
-          )}
+          )} */}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <Input

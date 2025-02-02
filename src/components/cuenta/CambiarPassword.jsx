@@ -1,188 +1,168 @@
-import React, { useState } from "react";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+// import { useState } from "react";
+import { usePasswordForm } from "../../hooks/useChangePass";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { passwordService } from "../../api/passwordService";
+import { Input } from "../ui/Input";
+import { validatePassword } from "../../utils/validadores";
 
 const CambiarPassword = () => {
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
-  const [showPassword, setShowPassword] = useState({
-    currentPassword: false,
-    newPassword: false,
-    confirmPassword: false,
-  });
-
   const navigate = useNavigate();
+  // const [passwordData, setPasswordData] = useState({
+  //   currentPassword: "",
+  //   newPassword: "",
+  //   confirmPassword: "",
+  // });
+  const { passwordData, errors, handleChange, validateForm, resetForm } =
+    usePasswordForm();
+  // const [errors, setErrors] = useState({});
 
   // Manejar cambios en los campos del formulario
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setPasswordData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setPasswordData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value,
+  //   }));
+  //   setErrors((prev) => ({ ...prev, [name]: "" }));
+  // };
 
-  // Alternar visibilidad de las contraseñas
-  const togglePasswordVisibility = (field) => {
-    setShowPassword((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
-  };
+  // const validateForm = () => {
+  //   const newErrors = {};
+
+  //   // Validación contraseña actual
+  //   if (!passwordData.currentPassword) {
+  //     newErrors.currentPassword = errorMessages.password.required;
+  //   }
+
+  //   // Validación nueva contraseña
+  //   if (!passwordData.newPassword) {
+  //     newErrors.newPassword = errorMessages.password.required;
+  //   } else if (!validatePassword(passwordData.newPassword)) {
+  //     newErrors.newPassword = errorMessages.password.invalid;
+  //   }
+
+  //   // Validación confirmar contraseña
+  //   if (!passwordData.confirmPassword) {
+  //     newErrors.confirmPassword = "Debe confirmar la nueva contraseña";
+  //   } else if (passwordData.newPassword !== passwordData.confirmPassword) {
+  //     newErrors.confirmPassword = "Las contraseñas no coinciden";
+  //   }
+
+  //   // Validación contraseñas diferentes
+  //   if (passwordData.currentPassword === passwordData.newPassword) {
+  //     newErrors.newPassword =
+  //       "La nueva contraseña no puede ser igual a la actual";
+  //   }
+
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
 
   // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setMessage(null);
 
-    // Validar contraseñas
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError("Las contraseñas nuevas no coinciden");
+    if (!validateForm()) {
       return;
     }
-    if (passwordData.currentPassword === passwordData.newPassword) {
-      setError("La nueva contraseña no puede ser igual a la actual");
-      return;
-    }
+
+    const toastId = toast.loading("Cambiando contraseña...");
 
     try {
       const userId = localStorage.getItem("id");
-      const token = localStorage.getItem("token");
+      await passwordService.changePassword(userId, passwordData);
 
-      if (!userId || !token) {
-        setError("No se pudo verificar al usuario. Por favor, inicia sesión.");
-        return;
-      }
+      toast.update(toastId, {
+        render: "¡Contraseña actualizada exitosamente!",
+        type: "success",
+        isLoading: false,
+        autoClose: 2000,
+      });
 
-      const response = await fetch(
-        `http://localhost:8080/auth/changePassword/${userId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(passwordData),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message || "Hubo un error al cambiar la contraseña");
-      } else {
-        setMessage("Contraseña cambiada exitosamente");
-        setPasswordData({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-
-        // Redirigir tras éxito
-        setTimeout(() => navigate("/dashboard"), 2000);
-      }
+      resetForm();
+      setTimeout(() => navigate("/mi-cuenta"), 2000);
     } catch (error) {
-      setError("Error de conexión. Intenta nuevamente.");
+      toast.update(toastId, {
+        render: error.message || "Error de conexión. Intente nuevamente.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
     }
+  };
+
+  // Mostrar requisitos de contraseña
+  const renderPasswordRequirements = () => {
+    if (!passwordData.newPassword) return null;
+
+    const missingRequirements = validatePassword.getMissingRequirements(
+      passwordData.newPassword,
+    );
+
+    return (
+      <div className="text-sm text-gray-600 mt-2">
+        <p>Requisitos de contraseña:</p>
+        <ul className="list-disc pl-5">
+          {[
+            "Mínimo 8 caracteres",
+            "Una letra mayúscula",
+            "Una letra minúscula",
+            "Un número",
+          ].map((req) => (
+            <li
+              key={req}
+              className={
+                missingRequirements.includes(req)
+                  ? "text-red-500"
+                  : "text-green-500"
+              }
+            >
+              {req}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   };
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <h2 className="text-xl font-semibold mb-4">Cambiar Contraseña</h2>
 
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      {message && <div className="text-green-500 mb-4">{message}</div>}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          label="Contraseña Actual"
+          name="currentPassword"
+          type="password"
+          value={passwordData.currentPassword}
+          onChange={handleChange}
+          error={errors.currentPassword}
+          required
+        />
 
-      <form onSubmit={handleSubmit}>
-        <div className="space-y-4">
-          {/* Contraseña Actual */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Contraseña Actual
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword.currentPassword ? "text" : "password"}
-                name="currentPassword"
-                value={passwordData.currentPassword}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => togglePasswordVisibility("currentPassword")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              >
-                {showPassword.currentPassword ? (
-                  <FaRegEye />
-                ) : (
-                  <FaRegEyeSlash />
-                )}
-              </button>
-            </div>
-          </div>
+        <Input
+          label="Nueva Contraseña"
+          name="newPassword"
+          type="password"
+          value={passwordData.newPassword}
+          onChange={handleChange}
+          error={errors.newPassword}
+          required
+          placeholder="Mínimo 8 caracteres, una mayúscula, una minúscula y un número"
+        />
 
-          {/* Nueva Contraseña */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Nueva Contraseña
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword.newPassword ? "text" : "password"}
-                name="newPassword"
-                value={passwordData.newPassword}
-                onChange={handleChange}
-                required
-                minLength={6}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => togglePasswordVisibility("newPassword")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              >
-                {showPassword.newPassword ? <FaRegEye /> : <FaRegEyeSlash />}
-              </button>
-            </div>
-          </div>
-
-          {/* Confirmar Nueva Contraseña */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Confirmar Nueva Contraseña
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword.confirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                value={passwordData.confirmPassword}
-                onChange={handleChange}
-                required
-                minLength={6}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => togglePasswordVisibility("confirmPassword")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              >
-                {showPassword.confirmPassword ? (
-                  <FaRegEye />
-                ) : (
-                  <FaRegEyeSlash />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-
+        <Input
+          label="Confirmar Nueva Contraseña"
+          name="confirmPassword"
+          type="password"
+          value={passwordData.confirmPassword}
+          onChange={handleChange}
+          error={errors.confirmPassword}
+          required
+          placeholder="Mínimo 8 caracteres, una mayúscula, una minúscula y un número"
+        />
+        {renderPasswordRequirements()}
         <div className="mt-6">
           <button
             type="submit"

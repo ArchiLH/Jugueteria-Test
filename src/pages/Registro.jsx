@@ -1,8 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { registerUser } from "../api/Registro";
+import { toast } from "react-toastify";
 
 function Registro() {
+  const navigate = useNavigate();
   // Estado para los campos del formulario
   const [formData, setFormData] = useState({
     username: "",
@@ -13,8 +15,6 @@ function Registro() {
 
   // Estado para los errores
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   // Manejar cambios en los inputs
   const handleChange = (e) => {
@@ -52,8 +52,6 @@ function Registro() {
   // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
 
     if (validateForm()) {
       try {
@@ -61,7 +59,14 @@ function Registro() {
         const receivedToken = data.token;
         localStorage.setItem("authToken", receivedToken);
 
-        setSuccessMessage("Registro exitoso. ¡Bienvenido!");
+        //Mostrar mensaje de éxito solo si el registro fue exitoso
+        toast.success("¡Registro exitoso!", {
+          position: "top-center",
+          autoClose: 5000,
+          pauseOnHover: false,
+        });
+
+        //setSuccessMessage("Registro exitoso. ¡Bienvenido!");
         console.log("Token recibido:", receivedToken);
 
         // Limpiar el formulario
@@ -71,6 +76,10 @@ function Registro() {
           email: "",
           password: "",
         });
+
+        // Redireccionar a la pagina de login
+        navigate("/login")
+
       } catch (error) {
         setErrorMessage("Error al conectar con la API");
         console.error("Error al conectar con la API:", error);
@@ -92,13 +101,7 @@ function Registro() {
 
         {/* Contenedor del formulario con fondo blanco */}
         <div className="bg-white rounded-lg shadow px-6 py-8 sm:px-8">
-          {/* Mostrar mensajes de Exito y Error */}
-          {successMessage && (
-            <div className="text-green-500 text-sm mb-4">{successMessage}</div>
-          )}
-          {errorMessage && (
-            <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
-          )}
+          
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
