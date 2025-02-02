@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Input } from "../ui/Input";
+import {
+  validateEmail,
+  validatePhone,
+  validateDNI,
+  errorMessages,
+} from "../../utils/validadores";
+import { toast } from "react-toastify";
 
 const DatosPersonales = () => {
   const navigate = useNavigate(); // Inicializa el hook de navigate
@@ -11,6 +19,7 @@ const DatosPersonales = () => {
     gender: "",
     dni: "",
   });
+  const [errors, setErrors] = useState({}); // Para manejar errores por campo
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -21,7 +30,7 @@ const DatosPersonales = () => {
 
     if (!userId) {
       setError("El id del usuario no es válido");
-      navigate("/login");  // Redirigir al login si no hay ID
+      navigate("/login"); // Redirigir al login si no hay ID
       return;
     }
 
@@ -36,7 +45,7 @@ const DatosPersonales = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (!response.ok) {
@@ -68,18 +77,44 @@ const DatosPersonales = () => {
     fetchData();
   }, [navigate]);
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!user.username) {
+      newErrors.username = errorMessages.username.required;
+    }
+
+    if (!user.email) {
+      newErrors.email = errorMessages.email.required;
+    } else if (!validateEmail(user.email)) {
+      newErrors.email = errorMessages.email.invalid;
+    }
+
+    if (user.phone && !validatePhone(user.phone)) {
+      newErrors.phone = errorMessages.phone.invalid;
+    }
+
+    if (user.dni && !validateDNI(user.dni)) {
+      newErrors.dni = errorMessages.dni.invalid;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Campo actualizado: ${name} = ${value}`); // Verificar qué campo se actualiza
+    //console.log(`Campo actualizado: ${name} = ${value}`); // Verificar qué campo se actualiza
     setUser((prevUser) => ({
       ...prevUser,
       [name]: value,
     }));
+    // Limpiar error del campo cuando se modifica
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleUpdate = async () => {
-    if (!user.username || !user.email) {
-      alert("Por favor, completa los campos obligatorios");
+    if (!validateForm()) {
       return;
     }
 
@@ -96,39 +131,53 @@ const DatosPersonales = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(user),
-        }
+        },
       );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        if (errorText) {
-          try {
-            const errorData = JSON.parse(errorText);
-            setError(errorData.error || "Error al actualizar el usuario");
-          } catch (parseError) {
-            setError("Error al procesar la respuesta de la API.");
-          }
-        } else {
-          setError("No se pudo procesar la respuesta de la API.");
-        }
-        return;
-      }
+      // if (!response.ok) {
+      //   const errorText = await response.text();
+      //   if (errorText) {
+      //     try {
+      //       const errorData = JSON.parse(errorText);
+      //       setError(errorData.error || "Error al actualizar el usuario");
+      //       // eslint-disable-next-line no-unused-vars
+      //     } catch (error) {
+      //       setError("Error al procesar la respuesta de la API.");
+      //     }
+      //   } else {
+      //     setError("No se pudo procesar la respuesta de la API.");
+      //   }
+      //   return;
+      // }
 
-      alert("Usuario actualizado con éxito");
+      toast.success("¡Actualizacion de datos exitoso!", {
+        position: "top-right",
+        autoClose: 3000,
+        pauseOnHover: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+
       setIsEditing(false);
     } catch (error) {
       console.error("Error al actualizar los datos:", error);
-      setError("Hubo un error al actualizar los datos");
+      toast.success("Error al Actualizar los Datos", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "light",
+      });
     }
   };
 
-  if (loading) {
-    return <div>Cargando...</div>;
-  }
+  // if (loading) {
+  //   return <div>Cargando...</div>;
+  // }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  // if (error) {
+  //   return <div>Error: {error}</div>;
+  // }
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
@@ -143,81 +192,56 @@ const DatosPersonales = () => {
       </div>
 
       <form onSubmit={(e) => e.preventDefault()}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
           <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Nombre de Usuario
-              </label>
-              <input
-                type="text"
-                name="username"
-                value={user.username}
-                onChange={handleChange}
-                required
-                disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-              />
-            </div>
+            <Input
+              label="Nombre de Usuario"
+              name="username"
+              value={user.username}
+              onChange={handleChange}
+              error={errors.username}
+              required
+              disabled={!isEditing}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={user.email}
-                onChange={handleChange}
-                required
-                disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-              />
-            </div>
+            <Input
+              label="Email"
+              name="email"
+              type="email"
+              value={user.email}
+              onChange={handleChange}
+              error={errors.email}
+              required
+              disabled={!isEditing}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                DNI
-              </label>
-              <input
-                type="text"
-                name="dni"
-                value={user.dni}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-              />
-            </div>
+            <Input
+              label="DNI"
+              name="dni"
+              value={user.dni}
+              onChange={handleChange}
+              error={errors.dni}
+              disabled={!isEditing}
+            />
           </div>
 
           <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Apellido
-              </label>
-              <input
-                type="text"
-                name="lastname"
-                value={user.lastname}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-              />
-            </div>
+            <Input
+              label="Apellido"
+              name="lastname"
+              value={user.lastname}
+              onChange={handleChange}
+              disabled={!isEditing}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Teléfono
-              </label>
-              <input
-                type="text"
-                name="phone"
-                value={user.phone}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-              />
-            </div>
+            <Input
+              label="Teléfono"
+              name="phone"
+              value={user.phone}
+              onChange={handleChange}
+              error={errors.phone}
+              disabled={!isEditing}
+            />
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
