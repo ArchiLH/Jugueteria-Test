@@ -6,23 +6,41 @@ export const passwordService = {
       throw new Error("Sesión no válida");
     }
 
-    const response = await fetch(
-      `http://localhost:8080/auth/changePassword/${userId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+    try {
+      const response = await fetch(
+        `http://localhost:8080/auth/changePassword/${userId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            currentPassword: passwordData.currentPassword,
+            newPassword: passwordData.newPassword,
+            confirmPassword: passwordData.confirmPassword,
+          }),
         },
-        body: JSON.stringify(passwordData),
-      },
-    );
+      );
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al cambiar la contraseña");
+      // Primero verifica si la respuesta es un JSON válido
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || "Error al cambiar la contraseña");
+        }
+        return data;
+      } else {
+        // Si no es JSON, obtén el texto de la respuesta
+        const text = await response.text();
+        if (!response.ok) {
+          throw new Error(text || "Error al cambiar la contraseña");
+        }
+        return { message: text };
+      }
+    } catch (error) {
+      throw new Error(error.message || "Error de conexión");
     }
-
-    return response.json();
   },
 };
