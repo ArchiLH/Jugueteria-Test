@@ -25,7 +25,7 @@ function MisPedidos() {
                      rounded-md shadow-sm text-sm font-medium text-white
                      bg-green-600 hover:bg-green-700 transition-colors duration-200"
           >
-            Ir a Comprar
+            Ir a Catalogo
           </Link>
         </div>
       ) : (

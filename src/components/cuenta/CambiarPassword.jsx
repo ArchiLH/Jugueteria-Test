@@ -8,56 +8,9 @@ import { validatePassword } from "../../utils/validadores";
 
 const CambiarPassword = () => {
   const navigate = useNavigate();
-  // const [passwordData, setPasswordData] = useState({
-  //   currentPassword: "",
-  //   newPassword: "",
-  //   confirmPassword: "",
-  // });
+
   const { passwordData, errors, handleChange, validateForm, resetForm } =
     usePasswordForm();
-  // const [errors, setErrors] = useState({});
-
-  // Manejar cambios en los campos del formulario
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setPasswordData((prevData) => ({
-  //     ...prevData,
-  //     [name]: value,
-  //   }));
-  //   setErrors((prev) => ({ ...prev, [name]: "" }));
-  // };
-
-  // const validateForm = () => {
-  //   const newErrors = {};
-
-  //   // Validación contraseña actual
-  //   if (!passwordData.currentPassword) {
-  //     newErrors.currentPassword = errorMessages.password.required;
-  //   }
-
-  //   // Validación nueva contraseña
-  //   if (!passwordData.newPassword) {
-  //     newErrors.newPassword = errorMessages.password.required;
-  //   } else if (!validatePassword(passwordData.newPassword)) {
-  //     newErrors.newPassword = errorMessages.password.invalid;
-  //   }
-
-  //   // Validación confirmar contraseña
-  //   if (!passwordData.confirmPassword) {
-  //     newErrors.confirmPassword = "Debe confirmar la nueva contraseña";
-  //   } else if (passwordData.newPassword !== passwordData.confirmPassword) {
-  //     newErrors.confirmPassword = "Las contraseñas no coinciden";
-  //   }
-
-  //   // Validación contraseñas diferentes
-  //   if (passwordData.currentPassword === passwordData.newPassword) {
-  //     newErrors.newPassword =
-  //       "La nueva contraseña no puede ser igual a la actual";
-  //   }
-
-  //   setErrors(newErrors);
-  //   return Object.keys(newErrors).length === 0;
-  // };
 
   // Manejar el envío del formulario
   const handleSubmit = async (e) => {

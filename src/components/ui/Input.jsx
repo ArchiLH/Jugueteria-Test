@@ -43,9 +43,9 @@ export const Input = ({
             className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800 cursor-pointer"
           >
             {showPassword ? (
-              <FiEyeOff className="h-5 w-5" />
-            ) : (
               <FiEye className="h-5 w-5" />
+            ) : (
+              <FiEyeOff className="h-5 w-5" />
             )}
           </button>
         )}

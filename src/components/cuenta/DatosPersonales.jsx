@@ -171,14 +171,6 @@ const DatosPersonales = () => {
     }
   };
 
-  // if (loading) {
-  //   return <div>Cargando...</div>;
-  // }
-
-  // if (error) {
-  //   return <div>Error: {error}</div>;
-  // }
-
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex justify-between items-center mb-6">

@@ -38,7 +38,7 @@ function Filtros({ filters, handleFilterChange }) {
           }}
           className="mr-2"
         />
-        <label htmlFor={item.id} className="text-gray-700">
+        <label  className="text-gray-700">
           {item.name}
         </label>
       </li>
@@ -57,7 +57,7 @@ function Filtros({ filters, handleFilterChange }) {
           onChange={() => handleFilterChange("marcas", item.brand)}
           className="mr-2"
         />
-        <label htmlFor={item.id} className="text-gray-700">
+        <label  className="text-gray-700">
           {item.brand}
         </label>
       </li>
