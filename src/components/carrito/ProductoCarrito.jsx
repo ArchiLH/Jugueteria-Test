@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaTrashAlt, FaMinus, FaPlus } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -18,9 +19,12 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
   };
 
   const handleQuantityUpdate = (newQuantity) => {
-    setIsUpdating(true);
+    if (newQuantity > producto.stock) {
+      toast.warning(`Solo hay ${producto.stock} unidades disponibles`);
+      return;
+    }
+
     onUpdateQuantity(newQuantity);
-    setTimeout(() => setIsUpdating(false), 500);
   };
 
   return (

@@ -1,24 +1,26 @@
-import { useParams } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';  // Importa useEffect
-import { useCart } from '../../context/CartContext';
-import { useFavoritos } from '../../context/FavoritosContext';
+import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react"; // Importa useEffect
+import { useCart } from "../../context/CartContext";
+import { useFavoritos } from "../../context/FavoritosContext";
 import { FaRegHeart, FaHeart, FaShoppingCart } from "react-icons/fa";
 
 function ProductDetail() {
-  const { id } = useParams();  // Obtiene el parámetro id de la URL
+  const { id } = useParams(); // Obtiene el parámetro id de la URL
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const { addItem, cart } = useCart(); // Obtenemos las funciones del contexto
   const { toggleFavorite, isFavorite } = useFavoritos(); // Obtenemos las funciones del contexto de favoritos
-  const [isAdding, setIsAdding] = useState(false);  
+  const [isAdding, setIsAdding] = useState(false);
+  // Estado del stock
+  const [stockDisponible, setStockDisponible] = useState(0);
 
   // Verificar si el producto ya está en el carrito
   const itemInCart = cart.find((item) => item.id === product?.id);
   const quantityInCart = itemInCart ? itemInCart.quantity : 0;
 
-  const productIsFavorite = isFavorite(product?.id); // Verifica si el producto es favorito o no 
+  const productIsFavorite = isFavorite(product?.id); // Verifica si el producto es favorito o no
 
   // Manejador para agregar al carrito
   const handleAddToCart = (e) => {
@@ -32,13 +34,12 @@ function ProductDetail() {
     }, 1000);
   };
 
-
   useEffect(() => {
     // Realiza la solicitud para obtener el producto específico con el id
     fetch(`http://localhost:8080/api/productos/${id}`)
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Error al cargar el producto');
+          throw new Error("Error al cargar el producto");
         }
         return response.json();
       })
@@ -50,7 +51,7 @@ function ProductDetail() {
         setError(error.message);
         setLoading(false);
       });
-  }, [id]);  // El hook se ejecutará nuevamente si el id cambia
+  }, [id]); // El hook se ejecutará nuevamente si el id cambia
 
   if (loading) {
     return <div>Cargando producto...</div>;
@@ -63,6 +64,37 @@ function ProductDetail() {
   if (!product) {
     return <div>Producto no encontrado</div>;
   }
+
+  useEffect(() => {
+    if (product) {
+      setStockDisponible(product.stock - quantityInCart);
+    }
+  }, [product, quantityInCart]);
+
+  // Renderiza el estado del stock
+  const renderStockStatus = () => {
+    if (!product) return null;
+
+    return (
+      <div className="mt-4">
+        <div className="flex items-center space-x-2">
+          {stockDisponible <= 0 ? (
+            <span className="text-red-500 font-medium py-1 px-3 bg-red-50 rounded-full">
+              Agotado
+            </span>
+          ) : stockDisponible <= 5 ? (
+            <span className="text-orange-500 font-medium py-1 px-3 bg-orange-50 rounded-full">
+              ¡Solo quedan {stockDisponible} unidades!
+            </span>
+          ) : (
+            <span className="text-green-500 font-medium py-1 px-3 bg-green-50 rounded-full">
+              En stock ({stockDisponible} disponibles)
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -89,25 +121,30 @@ function ProductDetail() {
 
           {/* Sección de Descripción */}
           <div className="mt-4">
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Descripción</h3>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              Descripción
+            </h3>
             <p className="text-gray-600 text-sm">{product.descripcion}</p>
           </div>
 
           <div className="mt-6">
+            {renderStockStatus()}
             {/* Botón de agregar al carrito */}
             <button
               onClick={handleAddToCart}
-              disabled={isAdding}
-              className={`w-full font-bold py-2 px-4 rounded transition-all flex items-center justify-center gap-2 ${isAdding
-                ? "bg-green-700 text-white cursor-not-allowed opacity-75"
-                : "bg-green-500 hover:bg-green-600 text-white"
-                }`}
+              disabled={isAdding || stockDisponible <= 0}
+              className={`mt-4 w-full md:w-auto px-6 py-3 rounded-lg font-semibold
+                      ${
+                        stockDisponible <= 0
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : "bg-green-500 hover:bg-green-600"
+                      } text-white transition-colors flex items-center justify-center gap-2`}
             >
-              <FaShoppingCart size={16} />
-              {isAdding
-                ? "¡Agregado!"
-                : quantityInCart > 0
-                  ? "Agregar más"
+              <FaShoppingCart />
+              {stockDisponible <= 0
+                ? "Agotado"
+                : isAdding
+                  ? "Agregando..."
                   : "Agregar al Carrito"}
             </button>
             <button
@@ -115,8 +152,9 @@ function ProductDetail() {
                 e.preventDefault();
                 toggleFavorite(product);
               }}
-              className={`text-gray-500 hover:text-red-500 flex items-center p-2 transition-colors ${productIsFavorite ? "text-red-500" : ""
-                }`}
+              className={`text-gray-500 hover:text-red-500 flex items-center p-2 transition-colors ${
+                productIsFavorite ? "text-red-500" : ""
+              }`}
             >
               {productIsFavorite ? (
                 <FaHeart size={20} />

@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useEffect } from "react";
+import { toast } from "react-toastify";
 
 // Crear el contexto
 const CartContext = createContext();
@@ -10,59 +11,96 @@ const initialState = {
   totalQuantity: 0,
 };
 
-// Función para calcular el subtotal del carrito
+// Función para calcular la cantidad total de items
+const calculateTotalQuantity = (cart) => {
+  return cart.reduce((total, item) => total + item.quantity, 0);
+};
+
+// Función para manejar las acciones del carrito
 function cartReducer(state, action) {
-  // switch para manejar las acciones del carrito 
+  // switch para manejar las acciones del carrito
   switch (action.type) {
-    // caso para agregar un item al carrito 
+    // caso para agregar un item al carrito
     case "ADD_ITEM": {
-      const existingItem = state.cart.find((item) => item.id === action.payload.id);
+      const existingItem = state.cart.find(
+        (item) => item.id === action.payload.id,
+      );
+
+      // Verificar stock disponible
+      const stockDisponible = action.payload.stock;
+      const cantidadActual = existingItem ? existingItem.quantity : 0;
+
+      if (cantidadActual >= stockDisponible) {
+        toast.warning("Has alcanzado el límite de stock disponible");
+        return state;
+      }
 
       const updatedCart = existingItem
         ? state.cart.map((item) =>
             item.id === action.payload.id
               ? { ...item, quantity: item.quantity + 1 }
-              : item
+              : item,
           )
         : [...state.cart, { ...action.payload, quantity: 1 }];
 
-      const totalQuantity = updatedCart.reduce((total, item) => total + item.quantity, 0);
+      // const totalQuantity = updatedCart.reduce(
+      //   (total, item) => total + item.quantity,
+      //   0,
+      // );
 
       return {
         ...state,
         cart: updatedCart,
         subtotal: calculateSubtotal(updatedCart),
-        totalQuantity,
+        totalQuantity: calculateTotalQuantity(updatedCart),
       };
     }
 
-    // caso para eliminar un item del carrito 
+    // caso para eliminar un item del carrito
     case "REMOVE_ITEM": {
-      const filteredCart = state.cart.filter((item) => item.id !== action.payload);
-      const totalQuantity = filteredCart.reduce((total, item) => total + item.quantity, 0);
+      const filteredCart = state.cart.filter(
+        (item) => item.id !== action.payload,
+      );
+      // const totalQuantity = filteredCart.reduce(
+      //   (total, item) => total + item.quantity,
+      //   0,
+      // );
 
       return {
         ...state,
         cart: filteredCart,
         subtotal: calculateSubtotal(filteredCart),
-        totalQuantity,
+        totalQuantity: calculateTotalQuantity(filteredCart),
       };
     }
 
     // caso para actualizar la cantidad de un item en el carrito
     case "UPDATE_QUANTITY": {
-      const updatedCartQuantity = state.cart.map((item) =>
-        item.id === action.payload.itemId
-          ? { ...item, quantity: action.payload.quantity }
-          : item
-      );
-      const totalQuantity = updatedCartQuantity.reduce((total, item) => total + item.quantity, 0);
+      // const updatedCartQuantity = state.cart.map((item) =>
+      //   item.id === action.payload.itemId
+      //     ? { ...item, quantity: action.payload.quantity }
+      //     : item,
+      // );
+      // const totalQuantity = updatedCartQuantity.reduce(
+      //   (total, item) => total + item.quantity,
+      //   0,
+      // );
 
+      // return {
+      //   ...state,
+      //   cart: updatedCartQuantity,
+      //   subtotal: calculateSubtotal(updatedCartQuantity),
+      //   totalQuantity,
+      // };
+      const { itemId, quantity } = action.payload;
+      const updatedCart = state.cart.map((item) =>
+        item.id === itemId ? { ...item, quantity } : item,
+      );
       return {
         ...state,
-        cart: updatedCartQuantity,
-        subtotal: calculateSubtotal(updatedCartQuantity),
-        totalQuantity,
+        cart: updatedCart,
+        subtotal: calculateSubtotal(updatedCart),
+        totalQuantity: calculateTotalQuantity(updatedCart),
       };
     }
 
@@ -125,4 +163,11 @@ export function CartProvider({ children }) {
 }
 
 // Hook personalizado para consumir el contexto
-export const useCart = () => useContext(CartContext);
+// export const useCart = () => useContext(CartContext);
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart debe ser usado dentro de un CartProvider");
+  }
+  return context;
+};
