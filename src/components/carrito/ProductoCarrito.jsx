@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaTrashAlt, FaMinus, FaPlus } from "react-icons/fa";
 import { toast } from "react-toastify";
 

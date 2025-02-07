@@ -1,101 +1,101 @@
 import { useParams } from "react-router-dom";
-import React, { useState, useEffect } from "react"; // Importa useEffect
+import { useState, useEffect } from "react"; // Importa useEffect
 import { useCart } from "../../context/CartContext";
 import { useFavoritos } from "../../context/FavoritosContext";
 import { FaRegHeart, FaHeart, FaShoppingCart } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 function ProductDetail() {
+  // Hooks basicos
   const { id } = useParams(); // Obtiene el parámetro id de la URL
+  const { addItem, cart } = useCart(); // Obtenemos las funciones del contexto
+  const { toggleFavorite, isFavorite } = useFavoritos(); // Obtenemos las funciones del contexto de favoritos
+
+  // estados
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const { addItem, cart } = useCart(); // Obtenemos las funciones del contexto
-  const { toggleFavorite, isFavorite } = useFavoritos(); // Obtenemos las funciones del contexto de favoritos
   const [isAdding, setIsAdding] = useState(false);
-  // Estado del stock
   const [stockDisponible, setStockDisponible] = useState(0);
 
-  // Verificar si el producto ya está en el carrito
+  // calcular derivados
   const itemInCart = cart.find((item) => item.id === product?.id);
   const quantityInCart = itemInCart ? itemInCart.quantity : 0;
-
   const productIsFavorite = isFavorite(product?.id); // Verifica si el producto es favorito o no
 
-  // Manejador para agregar al carrito
-  const handleAddToCart = (e) => {
-    e.preventDefault(); // Previene la navegación del Link
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/productos/${id}`,
+        );
+        if (!response.ok) {
+          throw new Error("Error al cargar el producto");
+        }
+        const data = await response.json();
+        setProduct(data);
+        setStockDisponible(data.stock - quantityInCart);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id, quantityInCart]);
+
+  // Manejadores de eventos
+  const handleAddToCart = () => {
+    if (stockDisponible <= 0) {
+      toast.error("Producto agotado");
+      return;
+    }
+
     setIsAdding(true);
     addItem(product);
+    toast.success("Producto agregado al carrito");
 
-    // Resetea el estado después de un momento
     setTimeout(() => {
       setIsAdding(false);
     }, 1000);
   };
 
-  useEffect(() => {
-    // Realiza la solicitud para obtener el producto específico con el id
-    fetch(`http://localhost:8080/api/productos/${id}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error al cargar el producto");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setProduct(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setError(error.message);
-        setLoading(false);
-      });
-  }, [id]); // El hook se ejecutará nuevamente si el id cambia
-
+  // Renderizado condicional
   if (loading) {
-    return <div>Cargando producto...</div>;
+    return <div className="text-center py-8">Cargando producto...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="text-center py-8 text-red-500">Error: {error}</div>;
   }
 
   if (!product) {
-    return <div>Producto no encontrado</div>;
+    return <div className="text-center py-8">Producto no encontrado</div>;
   }
 
-  useEffect(() => {
-    if (product) {
-      setStockDisponible(product.stock - quantityInCart);
-    }
-  }, [product, quantityInCart]);
-
-  // Renderiza el estado del stock
-  const renderStockStatus = () => {
-    if (!product) return null;
-
-    return (
-      <div className="mt-4">
-        <div className="flex items-center space-x-2">
-          {stockDisponible <= 0 ? (
-            <span className="text-red-500 font-medium py-1 px-3 bg-red-50 rounded-full">
-              Agotado
-            </span>
-          ) : stockDisponible <= 5 ? (
-            <span className="text-orange-500 font-medium py-1 px-3 bg-orange-50 rounded-full">
-              ¡Solo quedan {stockDisponible} unidades!
-            </span>
-          ) : (
-            <span className="text-green-500 font-medium py-1 px-3 bg-green-50 rounded-full">
-              En stock ({stockDisponible} disponibles)
-            </span>
-          )}
-        </div>
+  // Función para renderizar el estado del stock
+  const renderStockStatus = () => (
+    <div className="mt-4">
+      <div className="flex items-center space-x-2">
+        {stockDisponible <= 0 ? (
+          <span className="text-red-500 font-medium py-1 px-3 bg-red-50 rounded-full">
+            Agotado
+          </span>
+        ) : stockDisponible <= 5 ? (
+          <span className="text-orange-500 font-medium py-1 px-3 bg-orange-50 rounded-full">
+            ¡Solo quedan {stockDisponible} unidades!
+          </span>
+        ) : (
+          <span className="text-green-500 font-medium py-1 px-3 bg-green-50 rounded-full">
+            En stock ({stockDisponible} disponibles)
+          </span>
+        )}
       </div>
-    );
-  };
+    </div>
+  );
 
+  // render principal
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row -mx-4">

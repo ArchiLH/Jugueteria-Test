@@ -14,8 +14,9 @@ function ProductCard({ product }) {
   const itemInCart = cart.find((item) => item.id === product.id);
   const quantityInCart = itemInCart ? itemInCart.quantity : 0;
   const stockDisponible = product.stock - quantityInCart;
-
   const productIsFavorite = isFavorite(product.id); // Verificar si el producto es favorito o no y actualizar el estado de favoritos al hacer clic en el corazón de la tarjeta de producto y mostrar el icono correspondiente. Si el producto es favorito, se muestra el corazón lleno, de lo contrario, se muestra el corazón vacío.
+
+  const STOCK_BAJO_LIMITE = 5;
 
   // Función para mostrar el estado del stock
   const renderStockStatus = () => {
@@ -33,18 +34,6 @@ function ProductCard({ product }) {
       );
     }
   };
-
-  // Manejador para agregar al carrito
-  // const handleAddToCart = (e) => {
-  //   e.preventDefault(); // Previene la navegación del Link
-  //   setIsAdding(true);
-  //   addItem(product);
-
-  //   // Resetea el estado después de un momento
-  //   setTimeout(() => {
-  //     setIsAdding(false);
-  //   }, 1000);
-  // };
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -76,15 +65,26 @@ function ProductCard({ product }) {
       className="flex flex-col h-min border rounded-lg shadow hover:shadow-lg transition-shadow no-underline bg-white"
     >
       {/* Contenedor de imagen con tamaño fijo */}
-      <div className="w-full h-64 p-4 flex items-center justify-center">
+      <div className="w-full h-64 p-4 flex items-center justify-center relative">
         <img
           src={product.image}
           alt={`Imagen de ${product.name}`}
           className="max-h-full max-w-full object-contain"
         />
-        {stockDisponible <= 5 && stockDisponible > 0 && (
+        {/* {stockDisponible <= 5 && stockDisponible > 0 && (
           <div className="absolute top-2 right-2 bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded">
             ¡Últimas unidades!
+          </div>
+        )} */}
+        {stockDisponible <= STOCK_BAJO_LIMITE && stockDisponible > 0 && (
+          <div
+            className="absolute top-2 right-2 bg-orange-100 text-orange-800
+                          text-xs font-medium px-3 py-1 rounded-full shadow-sm
+                          border border-orange-200"
+          >
+            {stockDisponible <= 3
+              ? `¡Solo ${stockDisponible} ${stockDisponible === 1 ? "unidad" : "unidades"}!`
+              : "¡Últimas unidades!"}
           </div>
         )}
       </div>
