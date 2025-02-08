@@ -88,7 +88,7 @@ function ProductDetail() {
           </span>
         ) : (
           <span className="text-green-500 font-medium py-1 px-3 bg-green-50 rounded-full">
-            En stock ({stockDisponible} disponibles)
+            En stock: {stockDisponible} disponibles
           </span>
         )}
       </div>
@@ -132,7 +132,7 @@ function ProductDetail() {
             {/* Botón de agregar al carrito */}
             <button
               onClick={handleAddToCart}
-              disabled={isAdding || stockDisponible <= 0}
+              disabled={stockDisponible <= 0}
               className={`mt-4 w-full md:w-auto px-6 py-3 rounded-lg font-semibold
                       ${
                         stockDisponible <= 0
@@ -143,9 +143,9 @@ function ProductDetail() {
               <FaShoppingCart />
               {stockDisponible <= 0
                 ? "Agotado"
-                : isAdding
-                  ? "Agregando..."
-                  : "Agregar al Carrito"}
+                : // : isAdding
+                  // ? "Agregando..."
+                  "Agregar al Carrito"}
             </button>
             <button
               onClick={(e) => {

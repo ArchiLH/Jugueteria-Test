@@ -30,7 +30,9 @@ function ProductCard({ product }) {
       );
     } else {
       return (
-        <span className="text-green-500 text-sm font-medium">En stock</span>
+        <span className="text-green-500 text-sm font-medium">
+          En stock: {stockDisponible}
+        </span>
       );
     }
   };
@@ -50,13 +52,13 @@ function ProductCard({ product }) {
       return;
     }
 
-    setIsAdding(true);
+    // setIsAdding(true);
     addItem(product);
 
     toast.success("Producto agregado al carrito");
     setTimeout(() => {
       setIsAdding(false);
-    }, 1000);
+    }, 500);
   };
 
   return (
@@ -71,11 +73,7 @@ function ProductCard({ product }) {
           alt={`Imagen de ${product.name}`}
           className="max-h-full max-w-full object-contain"
         />
-        {/* {stockDisponible <= 5 && stockDisponible > 0 && (
-          <div className="absolute top-2 right-2 bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded">
-            ¡Últimas unidades!
-          </div>
-        )} */}
+
         {stockDisponible <= STOCK_BAJO_LIMITE && stockDisponible > 0 && (
           <div
             className="absolute top-2 right-2 bg-orange-100 text-orange-800
@@ -137,13 +135,14 @@ function ProductCard({ product }) {
                     }`}
         >
           <FaShoppingCart size={16} />
-          {isAdding
+          {/* {isAdding
             ? "¡Agregado!"
             : stockDisponible <= 0
               ? "Agotado"
               : quantityInCart > 0
-                ? `Agregar más (${stockDisponible} disponibles)`
-                : "Agregar al Carrito"}
+                ? "Agregar más"
+                : "Agregar al Carrito"} */}
+          {stockDisponible <= 0 ? "Agotado" : "Agregar al Carrito"}
         </button>
       </div>
     </Link>
