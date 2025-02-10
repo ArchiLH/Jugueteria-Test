@@ -23,7 +23,7 @@ const NavigationButtons = ({ step, isLoading, onPrevious, onNext, onSubmit }) =>
             disabled={isLoading}
             className="bg-green-500 text-white px-4 py-2 rounded"
           >
-            Confirmar Pago
+            Confirmar PagoO
           </button>
         )}
       </div>

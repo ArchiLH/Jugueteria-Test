@@ -15,7 +15,7 @@ const NavigationButtons = ({
                    focus:ring-offset-2"
           disabled={isLoading}
         >
-          ← Volver Atrás
+          ← Volver AtrásS
         </button>
       )}
 
@@ -56,7 +56,7 @@ const NavigationButtons = ({
         //         />
         //       </div>
         //     ) : (
-        //       "Pagar Ahora →"
+        //       "Pagar AhoraaA →"
         //     )}
         //   </button>
       )}
