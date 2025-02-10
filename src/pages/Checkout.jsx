@@ -9,10 +9,15 @@ import BannerCheckout from "../components/checkout/BannerCheckout";
 import { useCart } from "../context/CartContext";
 import { useEffect, useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
+import { pedidoService } from "../api/pedidoService";
+import { autenticacionUsuario } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 function Checkout() {
   const navigate = useNavigate();
-  const { cart, subtotal } = useCart();
+  const { cart, subtotal, clearCart } = useCart();
+  const { user } = autenticacionUsuario(); // Obtener usuario actual
+  const [ordenCreada, setOrdenCreada] = useState(null); // Nuevo estado
   const [productDetails, setProductDetails] = useState([]);
   const {
     step,
@@ -27,6 +32,27 @@ function Checkout() {
   const elements = useElements();
   const [clientSecret, setClientSecret] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Función para crear el pedido
+  const crearPedido = async (paymentIntentId) => {
+    try {
+      const pedidoData = {
+        usuarioId: user.userId,
+        total: subtotal.toFixed(2).toString(),
+        productos: cart.map((item) => ({
+          productoId: item.id,
+          cantidad: item.quantity,
+          precioUnitario: item.price.toFixed(2).toString(),
+        })),
+      };
+
+      const pedidoCreado = await pedidoService.crearPedido(pedidoData);
+      return pedidoCreado;
+    } catch (error) {
+      console.error("Error al crear el pedido:", error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     if (!cart || cart.length === 0) {
@@ -47,10 +73,10 @@ function Checkout() {
         {
           method: "GET",
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}` ,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       if (!response.ok) throw new Error("Error al obtener los productos");
 
@@ -77,18 +103,18 @@ function Checkout() {
         {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            amount: subtotal * 100, 
+            amount: subtotal * 100,
             currency: "PEN",
             products: cart.map((product) => ({
               id: product.id,
               quantity: product.quantity,
             })),
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -106,6 +132,37 @@ function Checkout() {
     if (subtotal > 0) fetchClientSecret();
   }, [subtotal]);
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   if (step === 3) {
+  //     if (!stripe || !elements || !clientSecret) return;
+
+  //     setIsProcessing(true);
+
+  //     try {
+  //       const payload = await stripe.confirmCardPayment(clientSecret, {
+  //         payment_method: {
+  //           card: elements.getElement(CardElement),
+  //         },
+  //       });
+
+  //       if (payload.error) {
+  //         console.error("Error en el pago:", payload.error.message);
+  //         alert("Error al procesar el pago. Inténtalo de nuevo.");
+  //       } else if (payload.paymentIntent.status === "succeeded") {
+  //         navigate("/confirmacion-orden");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error durante el pago:", error);
+  //     } finally {
+  //       setIsProcessing(false);
+  //     }
+  //   } else {
+  //     handleNextStep();
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -122,13 +179,42 @@ function Checkout() {
         });
 
         if (payload.error) {
-          console.error("Error en el pago:", payload.error.message);
-          alert("Error al procesar el pago. Inténtalo de nuevo.");
+          toast.error(
+            "Error al procesar el pago. Por favor, intenta de nuevo.",
+          );
         } else if (payload.paymentIntent.status === "succeeded") {
-          navigate("/confirmacion-orden");
+          try {
+            const pedido = await crearPedido(payload.paymentIntent.id);
+            clearCart();
+
+            toast.success("¡Pedido realizado con éxito!");
+
+            navigate("/confirmacion-orden", {
+              state: {
+                orderDetails: {
+                  id: pedido.id,
+                  numeroOrden: pedido.numeroOrden,
+                  fecha: pedido.fecha,
+                  estado: pedido.estado,
+                  total: pedido.total,
+                  detalles: pedido.detalles.map((detalle) => ({
+                    nombre: detalle.producto.nombre,
+                    cantidad: detalle.cantidad,
+                    precioUnitario: detalle.precioUnitario,
+                    subtotal: detalle.subtotal,
+                    imagen: detalle.producto.imagen,
+                  })),
+                },
+              },
+            });
+          } catch (error) {
+            toast.error(
+              "Error al procesar el pedido. Por favor, contacta a soporte.",
+            );
+          }
         }
       } catch (error) {
-        console.error("Error durante el pago:", error);
+        toast.error("Error durante el proceso de pago.");
       } finally {
         setIsProcessing(false);
       }
