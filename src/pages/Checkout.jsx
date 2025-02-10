@@ -28,40 +28,33 @@ function Checkout() {
   const [clientSecret, setClientSecret] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Validación para carrito vacío
-  // if (!cart || cart.length === 0) {
-  //   return (
-  //     <div className="text-center py-12">
-  //       <h2 className="text-2xl font-semibold mb-4">El carrito está vacío</h2>
-  //       <button
-  //         onClick={() => navigate("/product-catalog")}
-  //         className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-  //       >
-  //         Ir a Catalogo de Productos
-  //       </button>
-  //     </div>
-  //   );
-  // }
+  useEffect(() => {
+    if (!cart || cart.length === 0) {
+      navigate("/product-catalog");
+    }
+  }, [cart, navigate]);
 
-  // Función para obtener los productos del carrito
   const fetchProducts = async () => {
     try {
-      const productResponses = await Promise.all(
-        cart.map((product) =>
-          fetch(`http://localhost:8080/api/productos/${product.id}`),
-        ),
-      );
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token no encontrado. Inicia sesión para continuar.");
+      }
 
-      const productData = await Promise.all(
-        productResponses.map(async (res) => {
-          if (res.ok) {
-            return await res.json();
-          } else {
-            throw new Error(`Producto no encontrado: ${res.status}`);
-          }
-        }),
+      const productIds = cart.map((product) => product.id).join(",");
+      const response = await fetch(
+        `http://localhost:8080/api/productos/por-ids?ids=${productIds}`,
+        {
+          method: "GET",
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}` ,
+            "Content-Type": "application/json",
+          },
+        }
       );
+      if (!response.ok) throw new Error("Error al obtener los productos");
 
+      const productData = await response.json();
       setProductDetails(productData);
     } catch (error) {
       console.error("Error al cargar los productos:", error);
@@ -69,36 +62,40 @@ function Checkout() {
   };
 
   useEffect(() => {
-    fetchProducts(); // Cargar los productos al iniciar
+    if (cart.length > 0) fetchProducts();
   }, [cart]);
 
-  // Función para obtener el clientSecret del backend
   const fetchClientSecret = async () => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token no encontrado. Inicia sesión para continuar.");
+      }
+
       const response = await fetch(
         "http://localhost:8080/api/create-payment-intent",
         {
           method: "POST",
           headers: {
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            amount: subtotal * 100, // Monto en centavos
-            productId: cart.map((product) => product.id), // Lista de IDs de los productos
+            amount: subtotal * 100, 
+            currency: "PEN",
+            products: cart.map((product) => ({
+              id: product.id,
+              quantity: product.quantity,
+            })),
           }),
-        },
+        }
       );
 
-      // Registrar la respuesta en texto
-      const text = await response.text();
-      console.log("Respuesta del servidor:", text); // Ver qué se obtiene
-
+      const data = await response.json();
       if (response.ok) {
-        // Intentar parsear el texto solo si la respuesta es exitosa
-        const data = JSON.parse(text);
         setClientSecret(data.clientSecret);
       } else {
-        throw new Error(text || "Error al obtener el clientSecret");
+        throw new Error(data.message || "Error al obtener el clientSecret");
       }
     } catch (error) {
       console.error("Error al obtener el clientSecret:", error);
@@ -106,46 +103,40 @@ function Checkout() {
   };
 
   useEffect(() => {
-    if (subtotal > 0) {
-      fetchClientSecret(); // Obtener clientSecret cuando hay productos en el carrito
-    }
+    if (subtotal > 0) fetchClientSecret();
   }, [subtotal]);
 
-  // Función para manejar el submit del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Solo procesamos el pago si todos los pasos son válidos
     if (step === 3) {
-      if (!stripe || !elements || !clientSecret) {
-        return;
-      }
+      if (!stripe || !elements || !clientSecret) return;
 
       setIsProcessing(true);
 
-      // Confirmar el pago con Stripe
-      const payload = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement),
-        },
-      });
+      try {
+        const payload = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: elements.getElement(CardElement),
+          },
+        });
 
-      if (payload.error) {
-        console.error("Error en el pago:", payload.error.message);
-        // Mostrar un mensaje de error al usuario si ocurre un fallo
-      } else {
-        if (payload.paymentIntent.status === "succeeded") {
+        if (payload.error) {
+          console.error("Error en el pago:", payload.error.message);
+          alert("Error al procesar el pago. Inténtalo de nuevo.");
+        } else if (payload.paymentIntent.status === "succeeded") {
           navigate("/confirmacion-orden");
         }
+      } catch (error) {
+        console.error("Error durante el pago:", error);
+      } finally {
+        setIsProcessing(false);
       }
-
-      setIsProcessing(false);
     } else {
-      handleNextStep(); // Avanzar al siguiente paso si no estamos en el paso final
+      handleNextStep();
     }
   };
 
-  // Renderizar el contenido de acuerdo con el paso actual
   const renderStepContent = () => {
     switch (step) {
       case 1:
@@ -255,7 +246,7 @@ function Checkout() {
               subtotal={subtotal}
               descuentos={0}
               total={subtotal}
-              showCheckoutButton={false} // Para no mostrar el botón de proceder al pago
+              showCheckoutButton={false}
             />
           </div>
         </div>
