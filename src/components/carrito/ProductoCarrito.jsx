@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
 function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
-  const [quantity, setQuantity] = useState(producto.cantidad || 1);
+  const [quantity, setQuantity] = useState(producto.quantity);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleQuantityUpdate = (newQuantity) => {
@@ -12,10 +12,10 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
     setIsUpdating(true);
     setQuantity(newQuantity);
 
-    console.log(`Actualizando cantidad de ${producto.name}: ${newQuantity}`);
+    //console.log(`Actualizando cantidad de ${producto.name}: ${newQuantity}`);
 
     // Actualiza la cantidad en el carrito
-    onUpdateQuantity(producto.id, newQuantity);
+    onUpdateQuantity(newQuantity);
 
     setTimeout(() => setIsUpdating(false), 500);
   };
@@ -30,7 +30,7 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
       newValue = producto.stock;
     }
     setQuantity(newValue);
-    onUpdateQuantity(producto.id, newValue);
+    onUpdateQuantity(newValue);
   };
 
   return (

@@ -7,11 +7,11 @@ import OrderSummary from "../components/carrito/ResumenCarrito";
 import NavigationButtons from "../components/checkout/BotonesNavegacion";
 import BannerCheckout from "../components/checkout/BannerCheckout";
 import { useCart } from "../context/CartContext";
-import { useEffect, useState } from "react";
+import { useEffect} from "react";
 
 function Checkout() {
   const navigate = useNavigate();
-  const { cart, updateProductQuantity } = useCart();
+  const { cart, updateProductQuantity, subtotal } = useCart();
   const {
     step,
     formData,
@@ -21,32 +21,19 @@ function Checkout() {
     handleNextStep,
     handlePreviousStep,
   } = useCheckout();
-  const [subtotal, setSubtotal] = useState(0);
-  const [total, setTotal] = useState(0);
+  // const [subtotal, setSubtotal] = useState(0);
+  // const [total, setTotal] = useState(0);
 
-  // Recalcular Subtotal y Total cuando el carrito cambie
   useEffect(() => {
     if (!cart || cart.length === 0) {
       navigate("/product-catalog");
-    } else {
-      const calculatedSubtotal = cart.reduce((acc, item) => {
-        const cantidad = item.cantidad || 1; // Aseguramos que la cantidad no sea nula
-        console.log(`Producto: ${item.name}, Precio unitario: ${item.price}, Cantidad: ${cantidad}`);
-        return acc + (item.price || 0) * cantidad;
-      }, 0);
-      setSubtotal(calculatedSubtotal);
-
-      const calculatedTotal = calculatedSubtotal; // Si tienes descuentos, ajusta aquí
-      console.log("Subtotal calculado:", calculatedSubtotal);
-      console.log("Total calculado:", calculatedTotal);
-      setTotal(calculatedTotal);
     }
-  }, [cart, navigate]);
+  }, [cart, navigate]); // Solo activa la navegación si el carrito está vacío
 
   // Asegurarnos de que cuando se actualice la cantidad en el carrito, se refleje correctamente
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity > 0) {
-      updateProductQuantity(productId, newQuantity);  // Actualiza la cantidad en el carrito
+      updateProductQuantity(productId, newQuantity); // Actualiza la cantidad en el carrito
     }
   };
 
@@ -72,7 +59,7 @@ function Checkout() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ products }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -122,7 +109,7 @@ function Checkout() {
                         shadow-sm hover:shadow-md
                         flex justify-center items-center gap-2`}
             >
-              Ir a Stripe para pagar S/. {total.toFixed(2)}
+              Ir a Stripe para pagar S/. {subtotal.toFixed(2)}
             </button>
           </div>
         );
@@ -146,7 +133,7 @@ function Checkout() {
             <OrderSummary
               subtotal={subtotal}
               descuentos={0} // Asegúrate de que esta lógica esté bien si agregas descuentos
-              total={total}
+              total={subtotal}
               showCheckoutButton={false}
               handleQuantityChange={handleQuantityChange} // Pasa la función de cambio de cantidad
             />
