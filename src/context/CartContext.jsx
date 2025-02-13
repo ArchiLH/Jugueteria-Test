@@ -11,9 +11,19 @@ const initialState = {
   totalQuantity: 0,
 };
 
+// Función para calcular el subtotal
+const calculateSubtotal = (cart) => {
+  // return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  return cart.reduce(
+    (total, item) => total + (item.price || 0) * (item.quantity || 0),
+    0,
+  );
+};
+
 // Función para calcular la cantidad total de items
 const calculateTotalQuantity = (cart) => {
-  return cart.reduce((total, item) => total + item.quantity, 0);
+  // return cart.reduce((total, item) => total + item.quantity, 0);
+  return cart.reduce((total, item) => total + (item.quantity || 0), 0);
 };
 
 // Función para manejar las acciones del carrito
@@ -48,12 +58,13 @@ function cartReducer(state, action) {
       //   0,
       // );
 
-      return {
-        ...state,
-        cart: updatedCart,
-        subtotal: calculateSubtotal(updatedCart),
-        totalQuantity: calculateTotalQuantity(updatedCart),
-      };
+      // return {
+      //   ...state,
+      //   cart: updatedCart,
+      //   subtotal: calculateSubtotal(updatedCart),
+      //   totalQuantity: calculateTotalQuantity(updatedCart),
+      // };
+      return updateCartState(updatedCart);
     }
 
     // caso para eliminar un item del carrito
@@ -61,31 +72,18 @@ function cartReducer(state, action) {
       const filteredCart = state.cart.filter(
         (item) => item.id !== action.payload,
       );
-      // const totalQuantity = filteredCart.reduce(
-      //   (total, item) => total + item.quantity,
-      //   0,
-      // );
 
-      return {
-        ...state,
-        cart: filteredCart,
-        subtotal: calculateSubtotal(filteredCart),
-        totalQuantity: calculateTotalQuantity(filteredCart),
-      };
+      // return {
+      //   ...state,
+      //   cart: filteredCart,
+      //   subtotal: calculateSubtotal(filteredCart),
+      //   totalQuantity: calculateTotalQuantity(filteredCart),
+      // };
+      return updateCartState(filteredCart);
     }
 
     // caso para actualizar la cantidad de un item en el carrito
     case "UPDATE_QUANTITY": {
-      // const updatedCartQuantity = state.cart.map((item) =>
-      //   item.id === action.payload.itemId
-      //     ? { ...item, quantity: action.payload.quantity }
-      //     : item,
-      // );
-      // const totalQuantity = updatedCartQuantity.reduce(
-      //   (total, item) => total + item.quantity,
-      //   0,
-      // );
-
       // return {
       //   ...state,
       //   cart: updatedCartQuantity,
@@ -94,24 +92,23 @@ function cartReducer(state, action) {
       // };
       const { itemId, quantity } = action.payload;
       const updatedCart = state.cart.map((item) =>
-        item.id === itemId ? { ...item, quantity } : item,
+        // item.id === itemId ? { ...item, quantity } : item,
+        item.id === itemId
+          ? { ...item, quantity: quantity > 0 ? quantity : 1 }
+          : item,
       );
-      return {
-        ...state,
-        cart: updatedCart,
-        subtotal: calculateSubtotal(updatedCart),
-        totalQuantity: calculateTotalQuantity(updatedCart),
-      };
+      // return {
+      //   ...state,
+      //   cart: updatedCart,
+      //   subtotal: calculateSubtotal(updatedCart),
+      //   totalQuantity: calculateTotalQuantity(updatedCart),
+      // };
+      return updateCartState(updatedCart);
     }
 
     // caso para vaciar el carrito cuando se completa la compra
     case "CLEAR_CART": {
-      return {
-        ...state,
-        cart: [],
-        subtotal: 0,
-        totalQuantity: 0,
-      };
+      return initialState;
     }
 
     default:
@@ -119,19 +116,54 @@ function cartReducer(state, action) {
   }
 }
 
-// Función para calcular el subtotal
-const calculateSubtotal = (cart) => {
-  return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+// Función auxiliar para actualizar el estado del carrito
+const updateCartState = (cart) => {
+  // const subtotal = calculateSubtotal(cart);
+  return {
+    cart,
+    // subtotal: Number.isFinite(subtotal) ? subtotal : 0,
+    subtotal: calculateSubtotal(cart),
+    totalQuantity: calculateTotalQuantity(cart),
+  };
 };
 
 // Cargar el estado inicial desde localStorage
+// const loadInitialState = () => {
+//   try {
+//     const savedCart = localStorage.getItem("cart");
+//     return savedCart ? JSON.parse(savedCart) : initialState;
+//   } catch (error) {
+//     console.error("Error cargando carrito desde localStorage:", error);
+//     return initialState;
+//   }
+// };
+
 const loadInitialState = () => {
   try {
     const savedCart = localStorage.getItem("cart");
-    return savedCart ? JSON.parse(savedCart) : initialState;
+
+    // Si no hay nada en localStorage, devuelve el estado inicial
+    if (!savedCart) {
+      return initialState;
+    }
+
+    // Intenta parsear el JSON
+    const parsedCart = JSON.parse(savedCart);
+
+    // Verifica que parsedCart sea un array
+    if (Array.isArray(parsedCart)) {
+      return {
+        cart: parsedCart,
+        subtotal: calculateSubtotal(parsedCart), // Calcula el subtotal
+        totalQuantity: calculateTotalQuantity(parsedCart), // Calcula la cantidad total
+      };
+    }
+
+    // Si no es un array, devuelve el estado inicial
+    return initialState;
   } catch (error) {
     console.error("Error cargando carrito desde localStorage:", error);
-    return initialState;
+    return initialState; // Devuelve el estado inicial en caso de error
   }
 };
 
@@ -142,15 +174,15 @@ export function CartProvider({ children }) {
   // Actualizar localStorage cuando cambie el estado
   useEffect(() => {
     try {
-      localStorage.setItem("cart", JSON.stringify(state));
+      localStorage.setItem("cart", JSON.stringify(state.cart));
     } catch (error) {
       console.error("Error guardando carrito en localStorage:", error);
     }
-  }, [state]);
+  }, [state.cart]);
 
   const value = {
     cart: state.cart,
-    subtotal: state.subtotal,
+    subtotal: state.subtotal || 0,
     totalQuantity: state.totalQuantity,
     addItem: (item) => dispatch({ type: "ADD_ITEM", payload: item }),
     removeItem: (itemId) => dispatch({ type: "REMOVE_ITEM", payload: itemId }),

@@ -20,8 +20,6 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
     setIsUpdating(true);
     setQuantity(newQuantity);
 
-    //console.log(`Actualizando cantidad de ${producto.name}: ${newQuantity}`);
-
     // Actualiza la cantidad en el carrito
     onUpdateQuantity(newQuantity);
 

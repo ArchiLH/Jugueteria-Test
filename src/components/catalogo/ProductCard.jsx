@@ -11,7 +11,15 @@ function ProductCard({ product }) {
   const [isAdding, setIsAdding] = useState(false); // Estado para feedback visual
 
   // Verificar si el producto ya está en el carrito
-  const itemInCart = cart.find((item) => item.id === product.id);
+  // const itemInCart = cart.find((item) => item.id === product.id);
+  // const itemInCart = cart ? cart.find((item) => item.id === product.id) : null;
+
+  // Verifica que cart sea un array antes de usar find
+  const itemInCart =
+    cart && Array.isArray(cart)
+      ? cart.find((item) => item.id === product.id)
+      : null;
+
   const quantityInCart = itemInCart ? itemInCart.quantity : 0;
   const stockDisponible = product.stock - quantityInCart;
   const productIsFavorite = isFavorite(product.id); // Verificar si el producto es favorito o no y actualizar el estado de favoritos al hacer clic en el corazón de la tarjeta de producto y mostrar el icono correspondiente. Si el producto es favorito, se muestra el corazón lleno, de lo contrario, se muestra el corazón vacío.
@@ -54,8 +62,8 @@ function ProductCard({ product }) {
 
     // setIsAdding(true);
     addItem(product);
-
     toast.success("Producto agregado al carrito");
+    setIsAdding(false);
     setTimeout(() => {
       setIsAdding(false);
     }, 500);

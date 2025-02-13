@@ -47,7 +47,8 @@ function Checkout() {
 
       const products = cart.map((item) => ({
         stripePriceId: item.stripe_price_id,
-        quantity: item.cantidad || 1,
+        // quantity: item.cantidad || 1,
+        quantity: item.quantity > 0 ? item.quantity : 1, // Asegura mínimo 1
       }));
 
       const response = await fetch(
