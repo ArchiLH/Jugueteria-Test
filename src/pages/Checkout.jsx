@@ -7,11 +7,18 @@ import OrderSummary from "../components/carrito/ResumenCarrito";
 import NavigationButtons from "../components/checkout/BotonesNavegacion";
 import BannerCheckout from "../components/checkout/BannerCheckout";
 import { useCart } from "../context/CartContext";
-import { useEffect} from "react";
+import { useEffect, useState } from "react";
+import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
+import { pedidoService } from "../api/pedidoService";
+import { autenticacionUsuario } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 function Checkout() {
   const navigate = useNavigate();
-  const { cart, updateProductQuantity, subtotal } = useCart();
+  const { cart, subtotal, clearCart } = useCart();
+  const { user } = autenticacionUsuario(); // Obtener usuario actual
+  const [ordenCreada, setOrdenCreada] = useState(null); // Nuevo estado
+  const [productDetails, setProductDetails] = useState([]);
   const {
     step,
     formData,
@@ -21,60 +28,198 @@ function Checkout() {
     handleNextStep,
     handlePreviousStep,
   } = useCheckout();
-  // const [subtotal, setSubtotal] = useState(0);
-  // const [total, setTotal] = useState(0);
+  const stripe = useStripe();
+  const elements = useElements();
+  const [clientSecret, setClientSecret] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Función para crear el pedido
+  const crearPedido = async (paymentIntentId) => {
+    try {
+      const pedidoData = {
+        usuarioId: user.userId,
+        total: subtotal.toFixed(2).toString(),
+        productos: cart.map((item) => ({
+          productoId: item.id,
+          cantidad: item.quantity,
+          precioUnitario: item.price.toFixed(2).toString(),
+        })),
+      };
+
+      const pedidoCreado = await pedidoService.crearPedido(pedidoData);
+      return pedidoCreado;
+    } catch (error) {
+      console.error("Error al crear el pedido:", error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     if (!cart || cart.length === 0) {
       navigate("/product-catalog");
     }
-  }, [cart, navigate]); // Solo activa la navegación si el carrito está vacío
+  }, [cart, navigate]);
 
-  // Asegurarnos de que cuando se actualice la cantidad en el carrito, se refleje correctamente
-  const handleQuantityChange = (productId, newQuantity) => {
-    if (newQuantity > 0) {
-      updateProductQuantity(productId, newQuantity); // Actualiza la cantidad en el carrito
-    }
-  };
-
-  const handleStripeRedirect = async () => {
+  const fetchProducts = async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Inicia sesión para proceder al pago");
-        return;
+        throw new Error("Token no encontrado. Inicia sesión para continuar.");
       }
 
-      const products = cart.map((item) => ({
-        stripePriceId: item.stripe_price_id,
-        quantity: item.cantidad || 1,
-      }));
+      const productIds = cart.map((product) => product.id).join(",");
+      const response = await fetch(
+        `http://localhost:8080/api/productos/por-ids?ids=${productIds}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (!response.ok) throw new Error("Error al obtener los productos");
+
+      const productData = await response.json();
+      setProductDetails(productData);
+    } catch (error) {
+      console.error("Error al cargar los productos:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (cart.length > 0) fetchProducts();
+  }, [cart]);
+
+  const fetchClientSecret = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token no encontrado. Inicia sesión para continuar.");
+      }
 
       const response = await fetch(
-        "http://localhost:8080/api/create-checkout-session",
+        "http://localhost:8080/api/create-payment-intent",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ products }),
+          body: JSON.stringify({
+            amount: subtotal * 100,
+            currency: "PEN",
+            products: cart.map((product) => ({
+              id: product.id,
+              quantity: product.quantity,
+            })),
+          }),
         },
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(`Error al crear la sesión: ${errorData.error || "Desconocido"}`);
-        return;
-      }
-
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url;
+      const data = await response.json();
+      if (response.ok) {
+        setClientSecret(data.clientSecret);
+      } else {
+        throw new Error(data.message || "Error al obtener el clientSecret");
       }
     } catch (error) {
-      console.error("Error al iniciar el proceso de pago:", error);
-      alert("Hubo un problema al procesar el pago. Inténtalo de nuevo.");
+      console.error("Error al obtener el clientSecret:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (subtotal > 0) fetchClientSecret();
+  }, [subtotal]);
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   if (step === 3) {
+  //     if (!stripe || !elements || !clientSecret) return;
+
+  //     setIsProcessing(true);
+
+  //     try {
+  //       const payload = await stripe.confirmCardPayment(clientSecret, {
+  //         payment_method: {
+  //           card: elements.getElement(CardElement),
+  //         },
+  //       });
+
+  //       if (payload.error) {
+  //         console.error("Error en el pago:", payload.error.message);
+  //         alert("Error al procesar el pago. Inténtalo de nuevo.");
+  //       } else if (payload.paymentIntent.status === "succeeded") {
+  //         navigate("/confirmacion-orden");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error durante el pago:", error);
+  //     } finally {
+  //       setIsProcessing(false);
+  //     }
+  //   } else {
+  //     handleNextStep();
+  //   }
+  // };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (step === 3) {
+      if (!stripe || !elements || !clientSecret) return;
+
+      setIsProcessing(true);
+
+      try {
+        const payload = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: elements.getElement(CardElement),
+          },
+        });
+
+        if (payload.error) {
+          toast.error(
+            "Error al procesar el pago. Por favor, intenta de nuevo.",
+          );
+        } else if (payload.paymentIntent.status === "succeeded") {
+          try {
+            const pedido = await crearPedido(payload.paymentIntent.id);
+            clearCart();
+
+            toast.success("¡Pedido realizado con éxito!");
+
+            navigate("/confirmacion-orden", {
+              state: {
+                orderDetails: {
+                  id: pedido.id,
+                  numeroOrden: pedido.numeroOrden,
+                  fecha: pedido.fecha,
+                  estado: pedido.estado,
+                  total: pedido.total,
+                  detalles: pedido.detalles.map((detalle) => ({
+                    nombre: detalle.producto.nombre,
+                    cantidad: detalle.cantidad,
+                    precioUnitario: detalle.precioUnitario,
+                    subtotal: detalle.subtotal,
+                    imagen: detalle.producto.imagen,
+                  })),
+                },
+              },
+            });
+          } catch (error) {
+            toast.error(
+              "Error al procesar el pedido. Por favor, contacta a soporte.",
+            );
+          }
+        }
+      } catch (error) {
+        toast.error("Error durante el proceso de pago.");
+      } finally {
+        setIsProcessing(false);
+      }
+    } else {
+      handleNextStep();
     }
   };
 
@@ -102,14 +247,67 @@ function Checkout() {
             <h2 className="text-xl text-center font-semibold mb-4">
               Finalizar Compra
             </h2>
+            <div className="mb-6">
+              <CardElement
+                className="p-4 border rounded-md shadow-sm focus:ring-2 focus:ring-green-500"
+                options={{
+                  style: {
+                    base: {
+                      fontSize: "16px",
+                      color: "#424770",
+                      "::placeholder": {
+                        color: "#aab7c4",
+                      },
+                    },
+                    invalid: {
+                      color: "#9e2146",
+                    },
+                  },
+                }}
+              />
+            </div>
             <button
-              onClick={handleStripeRedirect}
+              disabled={isProcessing || !stripe || !elements}
+              type="submit"
               className={`w-full py-3 px-4 rounded-md text-white font-medium text-lg transition-colors duration-200
-                        bg-blue-500 hover:bg-blue-600 active:bg-blue-700
+                        ${
+                          isProcessing
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-green-500 hover:bg-green-600 active:bg-green-700"
+                        }
+                        disabled:opacity-50 disabled:cursor-not-allowed
                         shadow-sm hover:shadow-md
                         flex justify-center items-center gap-2`}
             >
-              Ir a Stripe para pagar S/. {subtotal.toFixed(2)}
+              {isProcessing ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Procesando...
+                </>
+              ) : (
+                <>
+                  <span>Pagar S/. {subtotal.toFixed(2)}</span>
+                </>
+              )}
             </button>
           </div>
         );
@@ -126,16 +324,15 @@ function Checkout() {
 
         <div className="flex flex-col md:flex-row gap-8">
           <div className="w-full md:w-2/3 bg-white rounded-lg shadow-md p-6">
-            {renderStepContent()}
+            <form onSubmit={handleSubmit}>{renderStepContent()}</form>
           </div>
 
           <div className="w-full md:w-1/3">
             <OrderSummary
               subtotal={subtotal}
-              descuentos={0} // Asegúrate de que esta lógica esté bien si agregas descuentos
+              descuentos={0}
               total={subtotal}
               showCheckoutButton={false}
-              handleQuantityChange={handleQuantityChange} // Pasa la función de cambio de cantidad
             />
           </div>
         </div>
@@ -145,6 +342,7 @@ function Checkout() {
           isLoading={isLoading}
           onPrevious={handlePreviousStep}
           onNext={handleNextStep}
+          onSubmit={handleSubmit}
         />
       </div>
     </>

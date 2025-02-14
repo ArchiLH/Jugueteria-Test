@@ -19,12 +19,7 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
     if (newQuantity < 1 || newQuantity > producto.stock) return;
     setIsUpdating(true);
     setQuantity(newQuantity);
-
-    //console.log(`Actualizando cantidad de ${producto.name}: ${newQuantity}`);
-
-    // Actualiza la cantidad en el carrito
     onUpdateQuantity(newQuantity);
-
     setTimeout(() => setIsUpdating(false), 500);
   };
 
@@ -95,7 +90,9 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
                 value={quantity}
                 onChange={handleInputChange}
                 disabled={isUpdating}
-                className={`w-16 text-center border-x px-2 py-1 ${isUpdating ? "cursor-not-allowed bg-gray-100" : ""}`}
+                className={`w-16 text-center border-x px-2 py-1 ${
+                  isUpdating ? "cursor-not-allowed bg-gray-100" : ""
+                }`}
               />
 
               <button
@@ -124,7 +121,7 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
             S/ {(producto.price * quantity).toFixed(2)}
           </p>
           {/* <p className="text-sm text-gray-500 mt-1">
-            Disponibles: {producto.stock}
+            Disponibles: {disponibles}
           </p> */}
         </div>
       </div>
