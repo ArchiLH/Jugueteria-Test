@@ -5,22 +5,21 @@ import BannerCategoria from "../components/banner/BannerCategoria";
 
 function CatalogoProductos() {
   // Estado para los productos siginifica que se inicializa con un array vacio y se usa para actualizar los productos vienen de la API
-  const [products, setProducts] = useState([]);  
+  const [products, setProducts] = useState([]);
   // Estado para los filtros, se inicializa con un objeto vacio y se usa para actualizar los filtros
   const [filters, setFilters] = useState({
     categorias: [],
     marcas: [],
     precio: [],
   });
-  const [orden, setOrden] = useState("");  // Estado para el orden de los productos
+  const [orden, setOrden] = useState(""); // Estado para el orden de los productos
   const [error, setError] = useState(null); // Estado para manejar errores
 
- 
-  // se usa useEffect para que se ejecute una vez que se renderiza el componente y se usa fetch para hacer la solicitud a la API 
-  // y se usa then para manejar la respuesta y catch para manejar el error 
+  // se usa useEffect para que se ejecute una vez que se renderiza el componente y se usa fetch para hacer la solicitud a la API
+  // y se usa then para manejar la respuesta y catch para manejar el error
   // y se usa setProducts para actualizar el estado de los productos significa que se actualiza el estado de los productos con los datos que se obtienen de la API
-  // y se usa Array.isArray para verificar que los datos sean un array y si no lo son se muestra un error 
-  // y se usa setError para actualizar el estado del error y mostrar el error en la consola 
+  // y se usa Array.isArray para verificar que los datos sean un array y si no lo son se muestra un error
+  // y se usa setError para actualizar el estado del error y mostrar el error en la consola
   useEffect(() => {
     fetch("http://localhost:8080/api/productos")
       .then((response) => {
@@ -81,7 +80,7 @@ function CatalogoProductos() {
       );
     }
 
-    // Filtro de marcas 
+    // Filtro de marcas
     if (filters.marcas.length > 0) {
       filteredProducts = filteredProducts.filter((product) =>
         filters.marcas.includes(product.brand),
@@ -111,7 +110,7 @@ function CatalogoProductos() {
 
   const filteredProducts = filterProducts(); // Obtener los productos filtrados
 
-  // Renderizar los productos 
+  // Renderizar los productos
   if (error) {
     return <div>{error}</div>;
   }
@@ -126,7 +125,7 @@ function CatalogoProductos() {
         url_imagen="https://images.unsplash.com/photo-1558060370-d644479cb6f7?q=80&w=2128&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         nombreCategoria="Catalogo de Juguetes"
       />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 bg-gray-100">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Catálogo</h1>
           <div className="flex items-center">
@@ -146,12 +145,12 @@ function CatalogoProductos() {
           </div>
         </div>
 
-        <div className="flex">
+        <div className="flex gap-6 ">
           {/* Filtros para el catálogo  */}
           <Filtros filters={filters} handleFilterChange={handleFilterChange} />
 
           {/* Lista de productos */}
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow ml-4">
+          <section className="w-2/3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 flex-grow ml-4 ">
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />

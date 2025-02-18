@@ -2,7 +2,7 @@ import { CiLock } from "react-icons/ci";
 
 const PaymentBanner = () => {
   return (
-    <div className="bg-white rounded-lg m-8">
+    <div className="rounded-lg m-8">
       <div className=" mx-auto">
         {/* Título y subtítulo */}
         <div className="flex justify-center mb-4">

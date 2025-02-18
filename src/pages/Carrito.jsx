@@ -100,7 +100,7 @@ function Carrito() {
         nombreCategoria="Carrito de Compras"
       />
 
-      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8 mb-0">
         <div className="w-full md:w-2/3">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold mb-6">

@@ -68,7 +68,7 @@ function Favoritos() {
         nombreCategoria="Mis Favoritos"
       />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 ">
         {/* Grid de productos */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((product) => {
@@ -102,7 +102,7 @@ function Favoritos() {
               <div
                 key={product.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden
-                               hover:shadow-lg transition-shadow duration-200"
+                                 hover:shadow-lg transition-shadow duration-200"
               >
                 {/* Contenido del producto */}
                 <div className="relative">
@@ -118,7 +118,7 @@ function Favoritos() {
                   {stockDisponible <= 5 && stockDisponible > 0 && (
                     <div
                       className="absolute top-2 right-2 bg-orange-100 text-orange-800
-                                        text-xs font-medium px-3 py-1 rounded-full"
+                                          text-xs font-medium px-3 py-1 rounded-full"
                     >
                       {/* ¡Solo {stockDisponible} disponibles! */}
                       Últimas unidades
@@ -127,7 +127,7 @@ function Favoritos() {
                   {stockDisponible === 0 && (
                     <div
                       className="absolute top-2 right-2 bg-red-100 text-red-800
-                                        text-xs font-medium px-3 py-1 rounded-full"
+                                          text-xs font-medium px-3 py-1 rounded-full"
                     >
                       Agotado
                     </div>
@@ -139,7 +139,7 @@ function Favoritos() {
                   <Link to={`/product/${product.id}`}>
                     <h4
                       className="text-lg font-semibold mb-2 hover:text-green-600
-                                       transition-colors duration-200"
+                                         transition-colors duration-200"
                     >
                       {product.name}
                     </h4>
@@ -153,10 +153,10 @@ function Favoritos() {
                   <div className="flex justify-between items-center my-2 mb-2">
                     {renderStockStatus()}
                     {/* {quantityInCart > 0 && (
-                      <span className="text-sm text-gray-500">
-                        {quantityInCart} en carrito
-                      </span>
-                    )} */}
+                        <span className="text-sm text-gray-500">
+                          {quantityInCart} en carrito
+                        </span>
+                      )} */}
                   </div>
 
                   {/* Botones de acción */}
@@ -165,11 +165,11 @@ function Favoritos() {
                       onClick={() => handleAddToCart(product)}
                       disabled={isLoading || stockDisponible <= 0}
                       className={`flex-1 py-2 px-4 rounded-lg flex items-center justify-center gap-2
-                                      ${
-                                        stockDisponible <= 0
-                                          ? "bg-gray-300 cursor-not-allowed"
-                                          : "bg-green-500 hover:bg-green-600"
-                                      } text-white transition-colors duration-200`}
+                                        ${
+                                          stockDisponible <= 0
+                                            ? "bg-gray-300 cursor-not-allowed"
+                                            : "bg-green-500 hover:bg-green-600"
+                                        } text-white transition-colors duration-200`}
                     >
                       <FaShoppingCart />
                       {stockDisponible <= 0 ? "Agotado" : "Agregar al Carrito"}
@@ -177,7 +177,7 @@ function Favoritos() {
                     <button
                       onClick={() => handleRemoveFromFavorites(product)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded-lg
-                                     transition-colors duration-200"
+                                       transition-colors duration-200"
                       title="Eliminar de favoritos"
                     >
                       <FaTrashAlt size={20} />

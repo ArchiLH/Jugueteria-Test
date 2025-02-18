@@ -72,7 +72,7 @@ function ProductCard({ product }) {
   return (
     <Link
       to={`/product/${product.id}`}
-      className="flex flex-col h-min border rounded-lg shadow hover:shadow-lg transition-shadow no-underline bg-white"
+      className="flex flex-col h-min border rounded-lg shadow hover:shadow-lg transition-shadow no-underline bg-white "
     >
       {/* Contenedor de imagen con tamaño fijo */}
       <div className="w-full h-64 p-4 flex items-center justify-center relative">
@@ -96,7 +96,7 @@ function ProductCard({ product }) {
       </div>
 
       {/* Contenedor de información del producto */}
-      <div className="flex flex-col flex-grow p-4">
+      <div className="flex flex-col flex-grow p-4 ">
         <div className="flex-grow">
           <p className="text-gray-500 uppercase text-xs">{product.brand}</p>
           <h3 className="text-lg font-semibold mt-2 truncate">

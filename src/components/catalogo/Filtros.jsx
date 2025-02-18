@@ -6,6 +6,7 @@ function Filtros({ filters, handleFilterChange }) {
     { id: 4, name: "Muñecas" },
     { id: 5, name: "Vehiculos" },
     { id: 6, name: "Juguetes Educativos" },
+    { id: 7, name: "Ofertas" },
   ];
 
   const marcas = [
@@ -24,7 +25,7 @@ function Filtros({ filters, handleFilterChange }) {
     { id: 4, range: "200-500" },
   ];
 
-  // Función para manejar el cambio de filtros de las categorías 
+  // Función para manejar el cambio de filtros de las categorías
   const renderCategoriasCheckboxes = () => {
     return categorias.map((item) => (
       <li key={item.id} className="flex items-center mb-2">
@@ -32,15 +33,13 @@ function Filtros({ filters, handleFilterChange }) {
           type="checkbox"
           id={item.id}
           value={item.name}
-          checked={filters.categorias.includes(item.name)} // Verifica si la categoría está seleccionada 
+          checked={filters.categorias.includes(item.name)} // Verifica si la categoría está seleccionada
           onChange={() => {
-            handleFilterChange("categorias", item.name); 
+            handleFilterChange("categorias", item.name);
           }}
           className="mr-2"
         />
-        <label  className="text-gray-700">
-          {item.name}
-        </label>
+        <label className="text-gray-700">{item.name}</label>
       </li>
     ));
   };
@@ -57,9 +56,7 @@ function Filtros({ filters, handleFilterChange }) {
           onChange={() => handleFilterChange("marcas", item.brand)}
           className="mr-2"
         />
-        <label  className="text-gray-700">
-          {item.brand}
-        </label>
+        <label className="text-gray-700">{item.brand}</label>
       </li>
     ));
   };
@@ -86,7 +83,7 @@ function Filtros({ filters, handleFilterChange }) {
   };
 
   return (
-    <aside className="w-1/4 p-4">
+    <aside className="w-auto p-4 ">
       <h2 className="text-xl font-bold text-green-600 mb-4">Filtros</h2>
 
       <div className="mb-6">
@@ -101,7 +98,7 @@ function Filtros({ filters, handleFilterChange }) {
 
       <div className="mb-6">
         <h3 className="font-semibold mb-2">Precio</h3>
-        <ul>{renderPreciosCheckboxes()}</ul>  {/* Renderiza los precios */}
+        <ul>{renderPreciosCheckboxes()}</ul> {/* Renderiza los precios */}
       </div>
     </aside>
   );

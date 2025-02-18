@@ -9,12 +9,12 @@ import { toast } from "react-toastify";
 import { useCart } from "../../context/CartContext"; // Asegúrate de importar el contexto de carrito
 
 function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para controlar la apertura del menú 
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para controlar la apertura del menú
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // Estado para controlar la apertura del menú de usuario
   const { user, logout } = autenticacionUsuario(); // Obtén el usuario y la función logout del contexto
-  const navigate = useNavigate(); // Hook de navegación 
+  const navigate = useNavigate(); // Hook de navegación
   const [isLoggingOut, setIsLoggingOut] = useState(false); // Estado para controlar el proceso de cierre de sesión
-  
+
   // Obtener los datos del carrito desde el contexto
   const { totalQuantity } = useCart(); // Usamos totalQuantity del contexto de carrito
 
@@ -30,14 +30,14 @@ function Navbar() {
 
   // Función para cerrar sesión
   const handleLogout = async () => {
-    setIsLoggingOut(true);  // Iniciar el proceso de cierre de sesión 
+    setIsLoggingOut(true); // Iniciar el proceso de cierre de sesión
     const toastId = toast.loading("Cerrando sesión..."); // Mostrar toast de carga
 
     // Simular un delay de 1 segundo antes de cerrar sesión
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       await logout();
-      setIsUserMenuOpen(false);  // Cerrar el menú de usuario cuenta
+      setIsUserMenuOpen(false); // Cerrar el menú de usuario cuenta
 
       // Actualizar toast a éxito
       toast.update(toastId, {
@@ -47,7 +47,7 @@ function Navbar() {
         autoClose: 1000,
       });
 
-      navigate("/");  // Redirigir al usuario a la página de inicio
+      navigate("/"); // Redirigir al usuario a la página de inicio
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       // Actualizar toast a error
@@ -160,7 +160,10 @@ function Navbar() {
               </Link>
 
               {/* Icono de carrito con cantidad */}
-              <Link to="carrito" className="text-gray-7000 hover:text-primary relative">
+              <Link
+                to="carrito"
+                className="text-gray-7000 hover:text-primary relative"
+              >
                 <FiShoppingCart className="text-xl" />
                 {totalQuantity > 0 && (
                   <span className="absolute bottom-2 left-4 text-xs text-white bg-gray-500 rounded-full w-5 h-5 flex items-center justify-center">
@@ -200,7 +203,7 @@ function Navbar() {
                   Juguetes
                 </Link>
                 <Link
-                  to=""
+                  to="/ofertas"
                   className="block px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50"
                 >
                   Nuestras Ofertas

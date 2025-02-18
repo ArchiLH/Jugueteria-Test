@@ -21,6 +21,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PagoExitoso from "./pages/PagoExitoso";
 import PagoCancelado from "./pages/PagoCancelado";
+import Ofertas from "./components/ofertas/Ofertas";
 
 // Cargar Stripe con tu clave pública
 const stripePromise = loadStripe(
@@ -33,7 +34,7 @@ function App() {
       <AppProviders>
         <div className="min-h-screen flex flex-col">
           <Navbar />
-          <main className="flex-grow">
+          <main className="flex-grow bg-gray-100">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/registro" element={<Registro />} />
@@ -61,7 +62,7 @@ function App() {
               <Route path="/favoritos" element={<Favoritos />} />
               <Route path="/product-catalog" element={<CatalogoProductos />} />
               <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/ofertas" element={<UnderConstruction />} />
+              <Route path="/ofertas" element={<Ofertas />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
