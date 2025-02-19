@@ -29,7 +29,9 @@ function ProductCard({ product }) {
   // Función para mostrar el estado del stock
   const renderStockStatus = () => {
     if (stockDisponible <= 0) {
-      return <span className="text-red-500 text-sm font-medium">Agotado</span>;
+      return (
+        <span className="text-red-500 text-sm font-medium">Sin Stock</span>
+      );
     } else if (stockDisponible <= 5) {
       return (
         <span className="text-orange-500 text-sm font-medium">
@@ -39,7 +41,7 @@ function ProductCard({ product }) {
     } else {
       return (
         <span className="text-green-500 text-sm font-medium">
-          En stock: {stockDisponible}
+          Stock: {stockDisponible}
         </span>
       );
     }
@@ -82,7 +84,21 @@ function ProductCard({ product }) {
           className="max-h-full max-w-full object-contain"
         />
 
-        {stockDisponible <= STOCK_BAJO_LIMITE && stockDisponible > 0 && (
+        {/* Mensaje de "Agotado" - PRIORIDAD ALTA */}
+        {stockDisponible <= 0 && (
+          <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
+            Agotado
+          </div>
+        )}
+
+        {/* Mensaje de "20% de descuento" - solo si NO está agotado */}
+        {product.categoria === "Ofertas" && stockDisponible > 0 && (
+          <div className="absolute top-2 left-2 bg-orange-400 text-white text-xs font-bold px-3 py-0.5 rounded-full shadow-md z-10">
+            20% de descuento
+          </div>
+        )}
+
+        {/* {stockDisponible <= STOCK_BAJO_LIMITE && stockDisponible > 0 && (
           <div
             className="absolute top-2 right-2 bg-orange-100 text-orange-800
                           text-xs font-medium px-3 py-1 rounded-full shadow-sm
@@ -92,7 +108,7 @@ function ProductCard({ product }) {
               ? `¡Solo ${stockDisponible} ${stockDisponible === 1 ? "unidad" : "unidades"}!`
               : "¡Últimas unidades!"}
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Contenedor de información del producto */}
@@ -108,10 +124,25 @@ function ProductCard({ product }) {
         </div>
 
         {/* Precio y botón de favoritos */}
-        <div className="flex items-center justify-between mt-4">
-          <p className="text-green-600 font-bold">
-            S/ {product.price.toFixed(2)}
-          </p>
+        <div className="flex items-center justify-between mt-2">
+          {/* Condicional para mostrar precio con descuento */}
+          {product.categoria === "Ofertas" ? (
+            <div className="flex flex-row-reverse items-center gap-4">
+              {/* Precio Original (Tachado) */}
+              <p className="text-gray-500 line-through text-sm">
+                S/ {product.price.toFixed(2)}
+              </p>
+              {/* Precio con Descuento (Resaltado) */}
+              <p className="text-green-600 font-bold">
+                S/ {(product.price * 0.8).toFixed(2)} {/* 20% de descuento */}
+              </p>
+            </div>
+          ) : (
+            // Si no es "Ofertas", muestra el precio normal
+            <p className="text-green-600 font-bold">
+              S/ {product.price.toFixed(2)}
+            </p>
+          )}
           <button
             onClick={(e) => {
               e.preventDefault();

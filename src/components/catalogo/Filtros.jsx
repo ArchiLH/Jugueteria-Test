@@ -1,7 +1,7 @@
 function Filtros({ filters, handleFilterChange }) {
   const categorias = [
     { id: 1, name: "Juegos de Mesa" },
-    { id: 2, name: "Juguetes Deportivos" },
+    //{ id: 2, name: "Juguetes Deportivos" },
     { id: 3, name: "Figuras de Accion" },
     { id: 4, name: "Muñecas" },
     { id: 5, name: "Vehiculos" },
@@ -15,7 +15,7 @@ function Filtros({ filters, handleFilterChange }) {
     { id: 3, brand: "HOT WHEELS" },
     { id: 4, brand: "MARVEL" },
     { id: 5, brand: "BARBIE" },
-    { id: 6, brand: "Lego" },
+    { id: 6, brand: "LEGO" },
   ];
 
   const precios = [

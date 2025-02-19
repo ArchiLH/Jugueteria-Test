@@ -113,22 +113,42 @@ function ProductDetail() {
           <p className="text-gray-600 text-sm mb-4">{product.brand}</p>
           <div className="flex mb-4">
             <span className="font-bold text-gray-700">Precio:</span>
-            <span className="text-gray-600 ml-2">
-              S/ {product.price.toFixed(2)}
-            </span>
+
+            {/* Condicional para mostrar precio con descuento */}
+            {product.categoria === "Ofertas" ? (
+              <div className="ml-2 flex flex-row-reverse items-center gap-4 content-center">
+                {/* Precio Original (Tachado) */}
+                <span className="text-gray-500 line-through text-sm">
+                  S/ {product.price.toFixed(2)}
+                </span>
+                {/* Precio con Descuento (Resaltado) */}
+                <span className="text-green-600 font-bold">
+                  S/ {(product.price * 0.8).toFixed(2)}{" "}
+                  {/* Ejemplo: 20% de descuento */}
+                </span>
+              </div>
+            ) : (
+              // Si no es "Ofertas", muestra el precio normal
+              <span className="text-gray-600 ml-2">
+                S/ {product.price.toFixed(2)}
+              </span>
+            )}
           </div>
-          <p className="text-gray-500 text-sm">Código: {product.code}</p>
+          <p className="text-gray-500 text-sm">
+            <span className="font-bold text-gray-700">Código:</span>{" "}
+            {product.id}
+          </p>
 
           {/* Sección de Descripción */}
           <div className="mt-4">
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              Descripción
+              Descripción:
             </h3>
             <p className="text-gray-600 text-sm">{product.descripcion}</p>
           </div>
 
-          <div className="mt-6">
-            {renderStockStatus()}
+          {renderStockStatus()}
+          <div className="mt-6 flex justify-stretch content-center">
             {/* Botón de agregar al carrito */}
             <button
               onClick={handleAddToCart}
@@ -152,10 +172,11 @@ function ProductDetail() {
                 e.preventDefault();
                 toggleFavorite(product);
               }}
-              className={`text-gray-500 hover:text-red-500 flex items-center p-2 transition-colors ${
+              className={`text-gray-500 hover:text-red-500 flex gap-2 items-center p-2 transition-colors ${
                 productIsFavorite ? "text-red-500" : ""
               }`}
             >
+              Agregar a Favoritos
               {productIsFavorite ? (
                 <FaHeart size={20} />
               ) : (

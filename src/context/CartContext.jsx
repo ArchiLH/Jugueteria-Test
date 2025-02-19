@@ -45,25 +45,23 @@ function cartReducer(state, action) {
         return state;
       }
 
+      let productToAdd = action.payload; // Producto a agregar inicialmente es el payload
+
+      // Calcular precio con descuento si es de la categoría "Ofertas"
+      if (action.payload.categoria === "Ofertas") {
+        const discountedPrice = action.payload.price * 0.8; // 20% de descuento
+        // Crear un nuevo objeto producto con el precio descontado
+        productToAdd = { ...action.payload, price: discountedPrice };
+      }
+
       const updatedCart = existingItem
         ? state.cart.map((item) =>
             item.id === action.payload.id
               ? { ...item, quantity: item.quantity + 1 }
               : item,
           )
-        : [...state.cart, { ...action.payload, quantity: 1 }];
+        : [...state.cart, { ...productToAdd, quantity: 1 }];
 
-      // const totalQuantity = updatedCart.reduce(
-      //   (total, item) => total + item.quantity,
-      //   0,
-      // );
-
-      // return {
-      //   ...state,
-      //   cart: updatedCart,
-      //   subtotal: calculateSubtotal(updatedCart),
-      //   totalQuantity: calculateTotalQuantity(updatedCart),
-      // };
       return updateCartState(updatedCart);
     }
 
@@ -73,23 +71,11 @@ function cartReducer(state, action) {
         (item) => item.id !== action.payload,
       );
 
-      // return {
-      //   ...state,
-      //   cart: filteredCart,
-      //   subtotal: calculateSubtotal(filteredCart),
-      //   totalQuantity: calculateTotalQuantity(filteredCart),
-      // };
       return updateCartState(filteredCart);
     }
 
     // caso para actualizar la cantidad de un item en el carrito
     case "UPDATE_QUANTITY": {
-      // return {
-      //   ...state,
-      //   cart: updatedCartQuantity,
-      //   subtotal: calculateSubtotal(updatedCartQuantity),
-      //   totalQuantity,
-      // };
       const { itemId, quantity } = action.payload;
       const updatedCart = state.cart.map((item) =>
         // item.id === itemId ? { ...item, quantity } : item,
@@ -97,12 +83,7 @@ function cartReducer(state, action) {
           ? { ...item, quantity: quantity > 0 ? quantity : 1 }
           : item,
       );
-      // return {
-      //   ...state,
-      //   cart: updatedCart,
-      //   subtotal: calculateSubtotal(updatedCart),
-      //   totalQuantity: calculateTotalQuantity(updatedCart),
-      // };
+
       return updateCartState(updatedCart);
     }
 
@@ -126,17 +107,6 @@ const updateCartState = (cart) => {
     totalQuantity: calculateTotalQuantity(cart),
   };
 };
-
-// Cargar el estado inicial desde localStorage
-// const loadInitialState = () => {
-//   try {
-//     const savedCart = localStorage.getItem("cart");
-//     return savedCart ? JSON.parse(savedCart) : initialState;
-//   } catch (error) {
-//     console.error("Error cargando carrito desde localStorage:", error);
-//     return initialState;
-//   }
-// };
 
 const loadInitialState = () => {
   try {

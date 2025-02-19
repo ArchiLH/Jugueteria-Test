@@ -91,7 +91,7 @@ function Footer() {
         {/* Copyright y créditos */}
         <div className="mt-8 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
           <p>© 2024 Mundo Mágico. Todos los derechos reservados</p>
-          <p className="mt-2 md:mt-0">Desarrollado por Suicide Squa</p>
+          <p className="mt-2 md:mt-0">Desarrollado por Suicide Squad</p>
         </div>
       </div>
     </footer>

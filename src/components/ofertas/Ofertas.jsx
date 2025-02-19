@@ -40,8 +40,8 @@ function Ofertas() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 ">
       <BannerCategoria
-        url_imagen="https://images.pexels.com/photos/3823025/pexels-photo-3823025.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" // Puedes cambiar esta URL
-        nombreCategoria="¡Ofertas Imperdibles!"
+        url_imagen="https://images.pexels.com/photos/163696/toy-car-toy-box-mini-163696.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+        nombreCategoria="🎟️ ¡Ofertas Imperdibles! 🎁"
       />
 
       <div className="container mx-auto px-4 py-8 ">
@@ -55,7 +55,6 @@ function Ofertas() {
 
           {/* Grilla de productos */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl">
-            {" "}
             {/* Añadido max-w-7xl para limitar el ancho */}
             {ofertasProductos.map((product) => (
               <ProductCard key={product.id} product={product} />

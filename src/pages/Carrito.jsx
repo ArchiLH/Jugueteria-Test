@@ -11,28 +11,7 @@ function Carrito() {
   // Usamos el contexto del carrito
   const { cart, removeItem, updateQuantity, subtotal, clearCart } = useCart();
 
-  // const decrementQuantity = () => {
-  //   if (producto.quantity > 1) {
-  //     handleQuantityUpdate(producto.quantity - 1);
-  //   }
-  // };
-
-  // const incrementQuantity = () => {
-  //   if (producto.quantity < MAX_QUANTITY) {
-  //     handleQuantityUpdate(producto.quantity + 1);
-  //   }
-  // };
-
-  // const handleRemoveItem = (productId) => {
-  //   removeItem(productId);
-  //   toast.success("Producto eliminado del carrito");
-  // };
-
   const handleClearCart = () => {
-    // if (window.confirm("¿Estás seguro de vaciar el carrito?")) {
-    //   clearCart();
-    //   toast.success("Carrito vaciado");
-    // }
     toast.info(
       <div className="flex flex-col justify-center items-center">
         <p>¿Estás seguro de vaciar el carrito?</p>
@@ -71,8 +50,8 @@ function Carrito() {
           url_imagen="https://images.pexels.com/photos/12932822/pexels-photo-12932822.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
           nombreCategoria="Carrito de Compras"
         />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center bg-white rounded-lg  p-8">
+        <div className="container mx-auto px-4 py-8 ">
+          <div className="text-center  rounded-lg  p-8 ">
             <FaShoppingCart className="mx-auto text-gray-400 w-16 h-16 mb-4" />
             <h2 className="text-2xl font-semibold mb-4">
               Tu carrito está vacío
@@ -100,7 +79,7 @@ function Carrito() {
         nombreCategoria="Carrito de Compras"
       />
 
-      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8 mb-0">
+      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8 mb-0 bg-gray-100">
         <div className="w-full md:w-2/3">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold mb-6">

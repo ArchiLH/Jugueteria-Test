@@ -115,12 +115,37 @@ function ProductoCarrito({ producto, onRemove, onUpdateQuantity }) {
         </div>
 
         <div className="text-right">
-          <p className="text-sm text-gray-500">
+          {/* Condicional para mostrar precio con descuento en el carrito */}
+          {producto.categoria === "Ofertas" ? (
+            <div>
+              <p className="text-sm text-gray-500">
+                S/ {producto.price.toFixed(2)} x {quantity}
+              </p>
+              <div className="flex gap-3 content-center items-center">
+                <p className="text-sm text-gray-500 line-through">
+                  S/ {(producto.price / 0.8).toFixed(2)}{" "}
+                </p>
+                <p className="font-bold text-lg text-green-600">
+                  S/ {(producto.price * quantity).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm text-gray-500">
+                S/ {producto.price.toFixed(2)} x {quantity}
+              </p>
+              <p className="font-bold text-lg text-green-600">
+                S/ {(producto.price * quantity).toFixed(2)}
+              </p>
+            </div>
+          )}
+          {/* <p className="text-sm text-gray-500">
             S/ {producto.price.toFixed(2)} x {quantity}
           </p>
           <p className="font-bold text-lg text-green-600">
             S/ {(producto.price * quantity).toFixed(2)}
-          </p>
+          </p> */}
           {/* <p className="text-sm text-gray-500 mt-1">
             Disponibles: {producto.stock}
           </p> */}
