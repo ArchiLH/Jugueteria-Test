@@ -164,5 +164,4 @@ function CatalogoProductos() {
     </>
   );
 }
-
 export default CatalogoProductos;

@@ -10,19 +10,19 @@ function Filtros({ filters, handleFilterChange }) {
   ];
 
   const marcas = [
-    { id: 1, brand: "MATTEL" },
-    { id: 2, brand: "HASBRO" },
-    { id: 3, brand: "HOT WHEELS" },
-    { id: 4, brand: "MARVEL" },
-    { id: 5, brand: "BARBIE" },
-    { id: 6, brand: "LEGO" },
+    { id: 8, brand: "MATTEL" },
+    { id: 9, brand: "HASBRO" },
+    { id: 10, brand: "HOT WHEELS" },
+    { id: 11, brand: "MARVEL" },
+    { id: 12, brand: "BARBIE" },
+    { id: 13, brand: "LEGO" },
   ];
 
   const precios = [
-    { id: 1, range: "0-50" },
-    { id: 2, range: "50-100" },
-    { id: 3, range: "100-200" },
-    { id: 4, range: "200-500" },
+    { id: 14, range: "0-50" },
+    { id: 15, range: "50-100" },
+    { id: 16, range: "100-200" },
+    { id: 17, range: "200-500" },
   ];
 
   // Función para manejar el cambio de filtros de las categorías
@@ -39,7 +39,9 @@ function Filtros({ filters, handleFilterChange }) {
           }}
           className="mr-2"
         />
-        <label className="text-gray-700">{item.name}</label>
+        <label htmlFor={item.id} className="text-gray-700">
+          {item.name}
+        </label>
       </li>
     ));
   };
@@ -56,7 +58,9 @@ function Filtros({ filters, handleFilterChange }) {
           onChange={() => handleFilterChange("marcas", item.brand)}
           className="mr-2"
         />
-        <label className="text-gray-700">{item.brand}</label>
+        <label htmlFor={item.id} className="text-gray-700">
+          {item.brand}
+        </label>
       </li>
     ));
   };
@@ -73,7 +77,7 @@ function Filtros({ filters, handleFilterChange }) {
           onChange={() => handleFilterChange("precio", item.range)}
           className="mr-2"
         />
-        <label className="text-gray-700">
+        <label htmlFor={item.id} className="text-gray-700">
           {item.range === "200-500"
             ? "S/200 - S/500"
             : `S/${item.range.replace("-", " - S/")}`}

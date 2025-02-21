@@ -35,10 +35,18 @@ const DatosPersonales = ({ errors, handleChange, formData }) => {
 
         const userData = await response.json();
 
-        handleChange({ target: { name: "username", value: userData.username || "" } });
-        handleChange({ target: { name: "lastname", value: userData.lastname || "" } });
-        handleChange({ target: { name: "email", value: userData.email || "" } });
-        handleChange({ target: { name: "phone", value: userData.phone || "" } });
+        handleChange({
+          target: { name: "username", value: userData.username || "" },
+        });
+        handleChange({
+          target: { name: "lastname", value: userData.lastname || "" },
+        });
+        handleChange({
+          target: { name: "email", value: userData.email || "" },
+        });
+        handleChange({
+          target: { name: "phone", value: userData.phone || "" },
+        });
         handleChange({ target: { name: "dni", value: userData.dni || "" } });
 
         setIsLoading(false);
@@ -58,7 +66,9 @@ const DatosPersonales = ({ errors, handleChange, formData }) => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold mb-4">Datos Personales</h2>
+      <h2 className="text-xl font-semibold mb-4 text-center">
+        Datos Personales
+      </h2>
       {error && <p className="text-red-500">{error}</p>}
       <div className="space-y-4">
         <Input

@@ -15,7 +15,7 @@ const NavigationButtons = ({
                    focus:ring-offset-2"
           disabled={isLoading}
         >
-          ← Volver AtrásS
+          ← Volver Atrás
         </button>
       )}
 
