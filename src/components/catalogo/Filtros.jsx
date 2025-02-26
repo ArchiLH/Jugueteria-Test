@@ -16,13 +16,14 @@ function Filtros({ filters, handleFilterChange }) {
     { id: 11, brand: "MARVEL" },
     { id: 12, brand: "BARBIE" },
     { id: 13, brand: "LEGO" },
+    { id: 14, brand: "BANPRESTO" },
   ];
 
   const precios = [
-    { id: 14, range: "0-50" },
-    { id: 15, range: "50-100" },
-    { id: 16, range: "100-200" },
-    { id: 17, range: "200-500" },
+    { id: 15, range: "0-50" },
+    { id: 16, range: "50-100" },
+    { id: 17, range: "100-200" },
+    { id: 18, range: "200-500" },
   ];
 
   // Función para manejar el cambio de filtros de las categorías

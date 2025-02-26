@@ -30,10 +30,10 @@ function PagoExitoso() {
               Seguir Comprando
             </Link>
             <Link
-              to="/mi-cuenta"
+              to="/carrito"
               className="inline-block bg-gray-100 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 transition-colors"
             >
-              Ver Mis Pedidos
+              Ir a Carrito
             </Link>
           </div>
         </div>
