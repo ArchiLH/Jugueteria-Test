@@ -1,4 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
+
+import { autenticacionUsuario } from "../context/AuthContext";
 import SidebarCuenta from "../components/cuenta/SideBarCuenta";
 import DatosPersonales from "../components/cuenta/DatosPersonales";
 import MisPedidos from "../components/cuenta/MisPedidos";
@@ -6,6 +8,7 @@ import CambiarPassword from "../components/cuenta/CambiarPassword";
 import Salir from "../components/cuenta/Salir";
 
 function MiCuenta() {
+  const { token } = autenticacionUsuario();  // Ahora se obtiene correctamente el token
   const [seccionActiva, setSeccionActiva] = useState("datos");
 
   const renderizarSeccion = () => {
@@ -13,7 +16,7 @@ function MiCuenta() {
       case "datos":
         return <DatosPersonales />;
       case "pedidos":
-        return <MisPedidos />;
+        return <MisPedidos token={token} />;
       case "password":
         return <CambiarPassword />;
       case "salir":

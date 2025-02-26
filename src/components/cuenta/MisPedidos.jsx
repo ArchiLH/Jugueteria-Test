@@ -1,41 +1,64 @@
-import { Link } from "react-router-dom";
-import { BiTask } from "react-icons/bi";
+import React, { useEffect, useState } from 'react';
 
-function MisPedidos() {
-  const pedidos = []; // Array vacío para simular que no hay pedidos
+const MisPedidos = ({ token }) => {
+    const [pedidos, setPedidos] = useState([]);
+    const [error, setError] = useState('');
 
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-xl font-semibold mb-6">Mis Pedidos</h2>
+    useEffect(() => {
+        console.log("Token recibido en MisPedidos:", token);  // Verifica si llega el token
 
-      {pedidos.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="mb-4">
-            <BiTask className="mx-auto h-12 w-12 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Aún no tienes pedidos realizados
-          </h3>
-          <p className="text-gray-500 mb-4">
-            Realiza tu primera compra y podrás ver tus pedidos aquí
-          </p>
-          <Link
-            to="/product-catalog"
-            className="inline-flex items-center px-4 py-2 border border-transparent
-                     rounded-md shadow-sm text-sm font-medium text-white
-                     bg-green-600 hover:bg-green-700 transition-colors duration-200"
-          >
-            Ir a Catalogo
-          </Link>
+        if (!token) {
+            setError("Token no disponible. Inicia sesión nuevamente.");
+            return;
+        }
+
+        const fetchPedidos = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/api/pedidos", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) throw new Error("No se pudieron obtener los pedidos.");
+
+                const data = await response.json();
+                setPedidos(data);
+            } catch (error) {
+                console.error("Error al obtener los pedidos:", error.message);
+                setError("No se pudieron cargar los pedidos.");
+            }
+        };
+
+        fetchPedidos();
+    }, [token]);
+
+    return (
+        <div>
+            <h1 className="text-2xl font-bold mb-4">Mis Pedidos</h1>
+            {error && <p className="text-red-500">{error}</p>}
+            {pedidos.length > 0 ? (
+                pedidos.map((pedido) => (
+                    <div key={pedido.id} className="border p-4 mb-4 rounded-lg shadow-lg">
+                        <p><strong>ID del Pedido:</strong> {pedido.eventId}</p>
+                        
+                        <p><strong>Monto:</strong> {pedido.amount / 100} {pedido.currency?.toUpperCase()}</p>
+                        
+                        <p><strong>Estado:</strong> {pedido.status}</p>
+                        {pedido.receiptUrl && (
+                            <p>
+                                <strong>Recibo:</strong> <a href={pedido.receiptUrl} target="_blank" rel="noopener noreferrer">Ver Recibo</a>
+                            </p>
+                        )}
+                    </div>
+                ))
+            ) : (
+                <p>No hay pedidos disponibles.</p>
+            )}
         </div>
-      ) : (
-        // Aquí irá el código para mostrar la lista de pedidos cuando existan
-        <div className="space-y-4">
-          {/* El mapeo de pedidos irá aquí cuando se implemente */}
-        </div>
-      )}
-    </div>
-  );
-}
+    );
+};
 
 export default MisPedidos;
