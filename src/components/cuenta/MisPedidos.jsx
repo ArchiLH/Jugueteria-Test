@@ -49,7 +49,7 @@ const MisPedidos = ({ token }) => {
                         <p><strong>Estado:</strong> {pedido.status}</p>
                         {pedido.receiptUrl && (
                             <p>
-                                <strong>Recibo:</strong> <a href={pedido.receiptUrl} target="_blank" rel="noopener noreferrer">Ver Recibo</a>
+                                <strong>Recibo:</strong> <a href={pedido.receiptUrl} target="_blank" rel="noopener noreferrer" className='text-blue-500'>Ver Recibo</a>
                             </p>
                         )}
                     </div>
